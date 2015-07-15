@@ -17,6 +17,7 @@
     "chalk": "^1.1.0",
     "commander": "^2.8.1",
     "lodash": "^3.10.0",
-    "machine-as-action": "^2.0.7"
+    "machine-as-script": "^1.0.4",
+    "machinepack-fs": "^5.1.0"
   }
 }

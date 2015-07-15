@@ -30,7 +30,7 @@ program.usage(chalk.gray('[options]')+' '+chalk.bold('<command>'))
 program.parse(process.argv);
 
 // Make an aliaser function for use below.
-var runAs = toMakeAliaser('kit');
+var runAs = makeAliaser('kit');
 
 
 // $ kit

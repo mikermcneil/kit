@@ -5,9 +5,15 @@ require('machine-as-script')({
 
 
     exits: {
+
       notAnNpmPackage: {
         description: 'This is not an NPM package.'
+      },
+
+      success: {
+        example: '0.0.0'
       }
+
     },
 
 
