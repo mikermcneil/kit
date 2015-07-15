@@ -21,6 +21,7 @@ require('machine-as-script')({
       var path = require('path');
       var _ = require('lodash');
       var Filesystem = require('machinepack-fs');
+      var LocalMachinepacks = require('machinepack-localmachinepacks');
       var NPM = require('machinepack-npm');
 
       Filesystem.readJson({
@@ -57,7 +58,6 @@ require('machine-as-script')({
             }).execSync();
           }
           catch (e){ /* fail silently */ }
-
           return exits.success(_.merge(npmMetadata, mpMetadata));
         }
       });
@@ -68,7 +68,7 @@ require('machine-as-script')({
     var _ = require('lodash');
     var chalk = require('chalk');
 
-    console.log('------------------------------------------------------------');
+    console.log('-----------------------------------------------------------------');
 
     // Package name  (+machinepack friendly name)
     console.log(chalk.bold(parsedMetadata.name) + (parsedMetadata.friendlyName?'   ('+parsedMetadata.friendlyName+')':''));
@@ -91,15 +91,15 @@ require('machine-as-script')({
 
     // URLs
     if (parsedMetadata.npmUrl) {
-      console.log(chalk.underline(parsedMetadata.npmUrl));
+      console.log('> '+chalk.underline(parsedMetadata.npmUrl));
     }
     if (parsedMetadata.sourceUrl) {
-      console.log(chalk.underline(parsedMetadata.sourceUrl));
+      console.log('> '+chalk.underline(parsedMetadata.sourceUrl));
     }
     if (parsedMetadata.nodeMachineUrl) {
-      console.log(chalk.underline(parsedMetadata.nodeMachineUrl));
+      console.log('> '+chalk.underline(parsedMetadata.nodeMachineUrl));
     }
-    console.log('------------------------------------------------------------');
+    console.log('-----------------------------------------------------------------');
     console.log();
 
   }
