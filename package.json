@@ -6,6 +6,17 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "bin": {
+    "kit": "./bin/kit.js",
+    "kit-about": "./bin/kit-about.js",
+    "kit-pkgversion": "./bin/kit-pkgversion.js"
+  },
   "author": "Mike McNeil",
-  "license": "Hunting"
+  "license": "Hunting",
+  "dependencies": {
+    "chalk": "^1.1.0",
+    "commander": "^2.8.1",
+    "lodash": "^3.10.0",
+    "machine-as-action": "^2.0.7"
+  }
 }
