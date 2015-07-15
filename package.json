@@ -18,6 +18,8 @@
     "commander": "^2.8.1",
     "lodash": "^3.10.0",
     "machine-as-script": "^1.0.4",
-    "machinepack-fs": "^5.1.0"
+    "machinepack-fs": "^5.1.0",
+    "machinepack-localmachinepacks": "^1.8.0",
+    "machinepack-npm": "^5.1.0"
   }
 }
