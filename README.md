@@ -156,6 +156,11 @@ See also:
 
 
 
+## Links / Reminders
+
++ [Make "Paste + Indent" the default behavior in Sublime Text 2](https://gist.github.com/mikermcneil/569874aad9a7c71a26ac8364c09f3a15)
+
+
 ## License
 
 MIT
