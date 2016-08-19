@@ -8,11 +8,6 @@ require('machine-as-script')({
 
   inputs: {
 
-    args: {
-      description: 'The serial command-line arguments.',
-      example: ['some words probably']
-    },
-
     width: {
       description: 'The width before wrapping.',
       example: 12,
@@ -44,7 +39,9 @@ require('machine-as-script')({
     var figlet = require('figlet');
     var ncp = require('copy-paste');
 
-    var text = inputs.args.join(' ');
+    // Get the serial command-line arguments (e.g. `['some words probably']`)
+    // and join them together into a single string.
+    var text = env.commandLineArgs.join(' ');
 
     // Replace each literal `\n` with an actual newline character.
     text = text.replace(/\\n/g, '\n');
