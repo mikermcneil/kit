@@ -44,13 +44,20 @@ require('machine-as-script')({
     var figlet = require('figlet');
     var ncp = require('copy-paste');
 
-    var originalText = inputs.args.join(' ');
+    var text = inputs.args.join(' ');
+
+    // Replace each literal `\n` with an actual newline character.
+    text = text.replace(/\\n/g, '\n');
 
     // Insert line breaks.
-    var origTextWithLineBreaks = wrap(originalText, { width: inputs.width, indent: '' });
+    // (but maintain deliberate newlines)
+    text = text.split('\n').map(function (line){
+      line = wrap(line, { width: inputs.width, indent: '' });
+      return line;
+    }).join('\n');
 
     // Build ascii art
-    var asciiArt = figlet.textSync(origTextWithLineBreaks, { font: inputs.font });
+    var asciiArt = figlet.textSync(text, { font: inputs.font });
 
 
     // Add `//` comments

@@ -24,6 +24,7 @@
     "machinepack-fs": "^5.1.0",
     "machinepack-localmachinepacks": "^1.8.0",
     "machinepack-npm": "^5.1.0",
+    "machinepack-process": "^2.0.2",
     "word-wrap": "1.1.0"
   }
 }

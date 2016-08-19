@@ -8,7 +8,7 @@ var util = require('util');
 var program = require('commander');
 var chalk = require('chalk');
 var _ = require('lodash');
-
+var Process = require('machinepack-process');
 
 var VERSION = require('../package.json').version;
 
@@ -22,8 +22,10 @@ program
 
 // Set up commands
 program.usage(chalk.gray('[options]')+' '+chalk.bold('<command>'))
-.command('exclaim', 'convert a message to ASCII art and copy it to your clipboard')
 .command('pkgversion', 'show the version of the package in the current directory')
+.command('exclaim', 'convert a message to ASCII art and copy it to your clipboard')
+// .command('h1', 'create a heading for your JavaScript code')
+// .command('h2', 'create a sub-heading for your JavaScript code')
 .command('about', 'what is kit?');
 
 
@@ -57,11 +59,22 @@ if (matchedCommand){
 //
 // (i.e. check aliases, since wasn't matched by any overtly exposed commands)
 if ( _.isString(program.args[0]) ) {
+
   if (_.contains(['h','he','hel'], program.args[0])) {
     return runAs('help');
   }
+
+  if (program.args[0] === 'h1') {
+    return runAs('exclaim', { font: 'ANSI Shadow', width: 12 });
+  }
+
+  if (program.args[0] === 'h2') {
+    return runAs('exclaim', { font: 'Calvin S', width: 35 });
+  }
+
   // ...
-}
+
+}//</if program.args[0] is a string...>
 
 
 
@@ -76,6 +89,8 @@ if ( _.isString(program.args[0]) ) {
 
 
 
+
+
 /**
  * Helper fn
  * @param  {String} prefix [the filename prefix to use, e.g. "kit"]
@@ -86,8 +101,17 @@ function makeAliaser (prefix){
 
   /**
    * @param  {String} aliasFor [string command to redirect to]
+   * @param  {Dictionary} cliOpts [a dictionary of options to convert/escape as CLI opts]
    */
-  return function _alias (aliasFor){
+  return function _alias (aliasFor, cliOpts){
+
+    if (_.isObject(cliOpts)) {
+      _.each(cliOpts, function (val, inputCodeName) {
+        var escapedAsCliOpt = Process.escapeCliOpt({ value: val }).execSync();
+        process.argv.push('--'+inputCodeName+'='+escapedAsCliOpt);
+      });
+    }
+
     require('./'+prefix+'-'+aliasFor);
   };
 }
