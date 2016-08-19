@@ -146,6 +146,16 @@ OK, I copied an ASCII-art-ified version of that message to your clipboard:
 
 
 
+## Credits
+
+This module wouldn\'t be possible without [@patorjk](https://github.com/patorjk)'s amazing work on [figlet](https://github.com/patorjk/figlet.js).
+
+See also:
++ [h1](http://patorjk.com/software/taag/#p=display&c=c%2B%2B&f=ANSI%20Shadow&t=Use%20this%20font%20%0Ato%20delineate%0Amajor%20sections%0Aof%20your%20code%0A(no%20more%20than%0A%20once%20per%20every%0A%20200%20lines%20of%20code))
++ [h2](http://patorjk.com/software/taag/#p=display&c=c%2B%2B&f=Calvin%20S&t=use%20this%20font%20to%20indicate%0Asmaller%20sections%20of%20our%20code.%0A%0Ae.g.%0A%0ACLICK%0A%5B-build%20light%20in%20ribbon-%5D)
+
+
+
 ## License
 
 MIT
