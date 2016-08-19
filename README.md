@@ -64,6 +64,7 @@ MIT License
 ```
 
 
+
 ## kit exclaim
 
 
@@ -143,6 +144,39 @@ OK, I copied an ASCII-art-ified version of that message to your clipboard:
 -----------------------------------------------------------------
 ```
 
+
+
+## kit h1
+
+```bash
+∑ kit h1 hi
+-----------------------------------------------------------------
+OK, I copied an ASCII-art-ified version of that message to your clipboard:
+
+//  ██╗  ██╗██╗
+//  ██║  ██║██║
+//  ███████║██║
+//  ██╔══██║██║
+//  ██║  ██║██║
+//  ╚═╝  ╚═╝╚═╝
+//             
+-----------------------------------------------------------------
+```
+
+
+## kit h2
+
+```bash
+
+∑ kit h2 hi
+-----------------------------------------------------------------
+OK, I copied an ASCII-art-ified version of that message to your clipboard:
+
+//  ┬ ┬┬
+//  ├─┤│
+//  ┴ ┴┴
+-----------------------------------------------------------------
+```
 
 
 
