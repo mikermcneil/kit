@@ -9,17 +9,21 @@
   "bin": {
     "kit": "./bin/kit.js",
     "kit-about": "./bin/kit-about.js",
-    "kit-pkgversion": "./bin/kit-pkgversion.js"
+    "kit-pkgversion": "./bin/kit-pkgversion.js",
+    "kit-exclaim": "./bin/kit-exclaim.js"
   },
   "author": "Mike McNeil",
   "license": "Hunting",
   "dependencies": {
     "chalk": "^1.1.0",
     "commander": "^2.8.1",
-    "lodash": "^3.10.0",
-    "machine-as-script": "^1.0.4",
+    "copy-paste": "1.3.0",
+    "figlet": "1.1.2",
+    "lodash": "3.10.1",
+    "machine-as-script": "^4.0.0",
     "machinepack-fs": "^5.1.0",
     "machinepack-localmachinepacks": "^1.8.0",
-    "machinepack-npm": "^5.1.0"
+    "machinepack-npm": "^5.1.0",
+    "word-wrap": "1.1.0"
   }
 }

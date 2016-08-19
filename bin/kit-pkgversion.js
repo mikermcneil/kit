@@ -1,68 +1,70 @@
 #!/usr/bin/env node
 
 require('machine-as-script')({
-  machine: {
 
 
-    exits: {
+  friendlyName: 'kit pkgversion',
 
-      notAnNpmPackage: {
-        description: 'This is not an NPM package.'
-      },
 
-      success: {
-        example: {}
-      }
+  exits: {
 
+    notAnNpmPackage: {
+      description: 'This is not an NPM package.'
     },
 
+    success: {
+      example: {}
+    }
 
-    fn: function (inputs, exits) {
-      var path = require('path');
-      var _ = require('lodash');
-      var Filesystem = require('machinepack-fs');
-      var LocalMachinepacks = require('machinepack-localmachinepacks');
-      var NPM = require('machinepack-npm');
+  },
 
-      Filesystem.readJson({
-        source: path.resolve('package.json'),
-        schema: {},
-      }).exec({
-        // An unexpected error occurred.
-        error: function(err) {
-          return exits.error(err);
-        },
-        // No file exists at the provided `source` path
-        doesNotExist: function() {
-          return exits.notAnNpmPackage(err);
-        },
-        // Could not parse file as JSON.
-        couldNotParse: function() {
-          return exits.notAnNpmPackage(err);
-        },
-        // OK.
-        success: function(packageMeta) {
 
-          var str = JSON.stringify(packageMeta);
+  fn: function (inputs, exits) {
+    var path = require('path');
+    var _ = require('lodash');
+    var Filesystem = require('machinepack-fs');
+    var LocalMachinepacks = require('machinepack-localmachinepacks');
+    var NPM = require('machinepack-npm');
 
-          // Parse metadata for the latest version of the NPM package given a package.json string.
-          var npmMetadata = NPM.parsePackageJson({
+    Filesystem.readJson({
+      source: path.resolve('package.json'),
+      schema: {},
+    }).exec({
+      // An unexpected error occurred.
+      error: function(err) {
+        return exits.error(err);
+      },
+      // No file exists at the provided `source` path
+      doesNotExist: function() {
+        return exits.notAnNpmPackage(err);
+      },
+      // Could not parse file as JSON.
+      couldNotParse: function() {
+        return exits.notAnNpmPackage(err);
+      },
+      // OK.
+      success: function(packageMeta) {
+
+        var str = JSON.stringify(packageMeta);
+
+        // Parse metadata for the latest version of the NPM package given a package.json string.
+        var npmMetadata = NPM.parsePackageJson({
+          json: str,
+        }).execSync();
+
+        // Parse machinepack data from the provided JSON string.
+        var mpMetadata = {};
+        try {
+          mpMetadata = LocalMachinepacks.parseMachinepackMetadata({
             json: str,
           }).execSync();
-
-          // Parse machinepack data from the provided JSON string.
-          var mpMetadata = {};
-          try {
-            mpMetadata = LocalMachinepacks.parseMachinepackMetadata({
-              json: str,
-            }).execSync();
-          }
-          catch (e){ /* fail silently */ }
-          return exits.success(_.merge(npmMetadata, mpMetadata));
         }
-      });
-    }
+        catch (e){ /* fail silently */ }
+        return exits.success(_.merge(npmMetadata, mpMetadata));
+      }
+    });
   }
+
 }).exec({
   success: function (parsedMetadata){
     var _ = require('lodash');

@@ -22,6 +22,7 @@ program
 
 // Set up commands
 program.usage(chalk.gray('[options]')+' '+chalk.bold('<command>'))
+.command('exclaim', 'convert a message to ASCII art and copy it to your clipboard')
 .command('pkgversion', 'show the version of the package in the current directory')
 .command('about', 'what is kit?');
 
