@@ -15,8 +15,8 @@ require('machine-as-script')({
 
     width: {
       description: 'The width before wrapping.',
-      example: 15,
-      defaultsTo: 15
+      example: 12,
+      defaultsTo: 12
     },
 
     font: {
