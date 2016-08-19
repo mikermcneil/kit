@@ -2,7 +2,20 @@
 
 ```bash
 ∑ kit about
-kit is a suite of @mikermcneil's personal command-line utilities.
+•  •  •  •  •  •  •  •  •  •  •  •  •  •  •  •  •  •  •  •  •  •  
+  ___--¬___
+ |~~ ``` ~~|
+ |         |
+ |_________|
+ |_________|
+
+kit v1.2.3
+(run kit for usage)
+
+kit is a light-hearted grab bag of command-line utilities.
+Feel free to fork, add whatever, and send PRs if you like.
+https://github.com/mikermcneil/kit
+•  •  •  •  •  •  •  •  •  •  •  •  •  •  •  •  •  •  •  •  •  •  
 ```
 
 

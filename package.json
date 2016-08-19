@@ -1,7 +1,7 @@
 {
   "name": "@mikermcneil/kit",
   "version": "1.2.3",
-  "description": "Tools for Mike.",
+  "description": "A couple of command-line utilities.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -13,7 +13,7 @@
     "kit-exclaim": "./bin/kit-exclaim.js"
   },
   "author": "Mike McNeil",
-  "license": "Hunting",
+  "license": "MIT",
   "dependencies": {
     "chalk": "^1.1.0",
     "commander": "^2.8.1",
