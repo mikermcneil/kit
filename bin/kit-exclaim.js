@@ -10,7 +10,19 @@ require('machine-as-script')({
 
     args: {
       description: 'The serial command-line arguments.',
-      example: 'some words probably'
+      example: ['some words probably']
+    },
+
+    width: {
+      description: 'The width before wrapping.',
+      example: 15,
+      defaultsTo: 15
+    },
+
+    font: {
+      description: 'The ASCII font to use.',
+      example: 'Calvin S',
+      defaultsTo: 'ANSI Shadow'
     }
 
   },
@@ -20,7 +32,7 @@ require('machine-as-script')({
 
     success: {
       outputFriendlyName: 'ASCII art',
-      example: 'youll see'
+      example: '//  ██╗   ██╗██████╗  ██████╗ ██████╗  █████╗ ██████╗ ███████╗    ███████╗ ██████╗ ███╗   ███╗███████╗    \n//  ██║   ██║██╔══██╗██╔════╝ ██╔══██╗██╔══██╗██╔══██╗██╔════╝    ██╔════╝██╔═══██╗████╗ ████║██╔════╝    \n//  ██║   ██║██████╔╝██║  ███╗██████╔╝███████║██║  ██║█████╗      ███████╗██║   ██║██╔████╔██║█████╗      \n//  ██║   ██║██╔═══╝ ██║   ██║██╔══██╗██╔══██║██║  ██║██╔══╝      ╚════██║██║   ██║██║╚██╔╝██║██╔══╝      \n//  ╚██████╔╝██║     ╚██████╔╝██║  ██║██║  ██║██████╔╝███████╗    ███████║╚██████╔╝██║ ╚═╝ ██║███████╗    \n//   ╚═════╝ ╚═╝      ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚══════╝    ╚══════╝ ╚═════╝ ╚═╝     ╚═╝╚══════╝    \n//                                                                                                        \n//  ██████╗ ███████╗██████╗ ███████╗                                                                      \n//  ██╔══██╗██╔════╝██╔══██╗██╔════╝                                                                      \n//  ██║  ██║█████╗  ██████╔╝███████╗                                                                      \n//  ██║  ██║██╔══╝  ██╔═══╝ ╚════██║                                                                      \n//  ██████╔╝███████╗██║     ███████║                                                                      \n//  ╚═════╝ ╚══════╝╚═╝     ╚══════╝                                                                      \n//                                                                                                        ',
     }
 
   },
@@ -32,14 +44,14 @@ require('machine-as-script')({
     var figlet = require('figlet');
     var ncp = require('copy-paste');
 
-    var originalText = inputs.args;
+    var originalText = inputs.args.join(' ');
 
     // Insert line breaks.
-    var origTextWithLineBreaks = wrap(originalText, { width: 15, indent: '' });
+    var origTextWithLineBreaks = wrap(originalText, { width: inputs.width, indent: '' });
 
     // Build ascii art
-    var asciiArt = figlet.textSync(origTextWithLineBreaks, { font: 'ANSI Shadow' });
-    // var asciiArt = figlet.textSync(originalText, { font: 'Calvin S' });
+    var asciiArt = figlet.textSync(origTextWithLineBreaks, { font: inputs.font });
+
 
     // Add `//` comments
     asciiArt =
