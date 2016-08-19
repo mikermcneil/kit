@@ -9,7 +9,7 @@ kit is a suite of @mikermcneil's personal command-line utilities.
 ## Installation
 
 ```bash
-∑ npm install -g kit
+∑ npm install -g @mikermcneil/kit
 ```
 
 ## kit
