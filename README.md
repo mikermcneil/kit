@@ -1,3 +1,4 @@
+![kit](http://i.imgur.com/hDtNWrI.jpg)
 # kit
 
 ```bash
