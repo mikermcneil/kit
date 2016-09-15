@@ -41,7 +41,7 @@ require('machine-as-script')({
 
     // Get the serial command-line arguments (e.g. `['some words probably']`)
     // and join them together into a single string.
-    var text = env.commandLineArgs.join(' ');
+    var text = env.serialCommandLineArgs.join(' ');
 
     // Replace each literal `\n` with an actual newline character.
     text = text.replace(/\\n/g, '\n');

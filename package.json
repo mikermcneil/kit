@@ -20,7 +20,7 @@
     "copy-paste": "1.3.0",
     "figlet": "1.1.2",
     "lodash": "3.10.1",
-    "machine-as-script": "^4.0.1",
+    "machine-as-script": "^4.0.6",
     "machinepack-fs": "^5.1.0",
     "machinepack-localmachinepacks": "^1.8.0",
     "machinepack-npm": "^5.1.0",
