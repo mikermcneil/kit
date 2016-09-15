@@ -1,6 +1,6 @@
 {
   "name": "@mikermcneil/kit",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "A couple of command-line utilities.",
   "main": "index.js",
   "scripts": {
