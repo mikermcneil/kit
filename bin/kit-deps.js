@@ -190,6 +190,10 @@ require('machine-as-script')({
 
     var totalSize = 0;
 
+
+    // Used for padding below.
+    var COLUMN_1_MAX_WIDTH = 50;
+
     _.each(depInfos, function (depInfo, packageName) {
 
       var humanReadableSize = (function _getHumanReadableSize() {
@@ -204,19 +208,70 @@ require('machine-as-script')({
         }
       })();
 
-      console.log(
+      // Figure out some facts about the installed version vs. semver range.
+      var isDefinitelyNotPinned = (depInfo.semverRange[0]==='^' || depInfo.semverRange[0]==='~');
+      var isSameVersion = (depInfo.semverRange === depInfo.installedVersion);
+      var isMinVersion;
+      if (isDefinitelyNotPinned) {
+        isMinVersion = depInfo.semverRange.slice(1) === depInfo.installedVersion;
+      }
+      else {
+        isMinVersion = true;
+      }
+      var isDifferentEnoughToMaybeMatter = !isSameVersion && !isMinVersion;
+
+
+      // If version is definitely not pinned, mention that.
+      // (it might be fine-- if it's a dep you trust- but you still need to know)
+      // (
+      //   isDefinitelyNotPinned ?
+      //     chalk.green.dim('(not pinned)') :
+      //     ''
+      // )
+
+      var column1 = (
         // Package name + installed version
-        chalk.bold(packageName)+'@'+depInfo.installedVersion + '  ' +
-        // Only draw semver range if it's different than the actual installed version.
         (
-          (depInfo.semverRange !== depInfo.installedVersion) ?
-            '(svr: '+depInfo.semverRange+')   ' :
+          isDefinitelyNotPinned ?
+            chalk.bold.green(packageName)+'@'+depInfo.installedVersion :
+            chalk.bold(packageName)+'@'+depInfo.installedVersion
+        )+'  '+
+        // Draw semver range, but only if it's different enough from the actual
+        // installed version to maybe matter.
+        (
+          isDifferentEnoughToMaybeMatter ?
+            chalk.yellow.dim('(svr: '+depInfo.semverRange+')')+'   ' :
             ''
-        )+
-        // Size of installed package in bytes
-        humanReadableSize+'   '+
-        chalk.gray('('+depInfo.size + ' bytes)')
+        )
       );
+
+
+      // Padding for readability
+      var padding = '';
+      var numPaddingChars = COLUMN_1_MAX_WIDTH - column1.length;
+      // If we end up with a number <= 0, (i.e. because it's too long),
+      // then just skip ahead.
+      if (numPaddingChars > 0) {
+        padding = _.repeat(' ', numPaddingChars);
+      }
+
+      var column2 = (
+        // Size of installed package in the appropriate unit
+        humanReadableSize
+      );
+
+
+      // Build final console output.
+      var consoleOutput = (
+        column1 +
+        padding +
+        column2 +
+        '  ' + chalk.red(COLUMN_1_MAX_WIDTH + ' - ' + column1.length + ' = ' + numPaddingChars + ' ::' + column1)
+      );
+
+      console.log(consoleOutput);
+
+
 
       totalSize += depInfo.size;
 
