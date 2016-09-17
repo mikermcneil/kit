@@ -260,7 +260,7 @@ require('machine-as-script')({
             console.log();
             console.log('Altogether, dependencies weigh in at ' + getHumanReadableSize(totalSize));
             var COFFEE_SHOP_MEGABYTES_PER_SEC = 2;
-            var seconds = (totalSize/1000000) / COFFEE_SHOP_MEGABYTES_PER_SEC;
+            var seconds = Math.floor(( (totalSize/1000000) / COFFEE_SHOP_MEGABYTES_PER_SEC )*100)/100;
             // console.log('seconds:',seconds);
             console.log('(that will take an average of '+getHumanReadableDuration(seconds)+' on coffee shop internet)');
             console.log();

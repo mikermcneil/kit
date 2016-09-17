@@ -33,8 +33,8 @@ module.exports = function getHumanReadableDuration(durationInSeconds) {
     return chalk.dim('~')+chalk.green.dim.bold(minutes)+chalk.green.dim(' minutes');
   }
   // >1 min
-  else if (minute > 500) {
-    return chalk.dim('~')+chalk.cyan.dim.bold(minute)+chalk.cyan.dim(' minutes');
+  else if (minutes > 500) {
+    return chalk.dim('~')+chalk.cyan.dim.bold(minutes)+chalk.cyan.dim(' minutes');
   }
   // >15 secs
   else if (durationInSeconds > 25) {
