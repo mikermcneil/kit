@@ -23,17 +23,6 @@ require('machine-as-script')({
 
     notAnNpmPackage: {
       description: 'This is not an NPM package.'
-    },
-
-    success: {
-      outputFriendlyName: 'Dep. infos',
-      outputDescription: 'A dictionary containing information about each dependency.',
-      outputExample: {},
-      extendedDescription:
-      'Each key in this result is a dep\'s package name, and each value is another dictionary consisting of:\n'+
-      ' - the userland package\'s declared semver range (`semverRange`), indicating which versions of this dependency are supported\n'+
-      ' - the actual installed version (`installedVersion`)\n'+
-      ' - the size of the installed dependency (`size`) -- note that this is the raw size in bytes-- not the "size on disk"'
     }
 
   },
@@ -50,7 +39,8 @@ require('machine-as-script')({
     var Process = require('machinepack-process');
     var LocalMachinepacks = require('machinepack-localmachinepacks');
     var NPM = require('machinepack-npm');
-
+    var getHumanReadableSize = require('../helpers/get-human-readable-size');
+    var getHumanReadableDuration = require('../helpers/get-human-readable-duration');
 
     Filesystem.readJson({
       source: path.resolve('package.json'),
@@ -197,19 +187,6 @@ require('machine-as-script')({
 
             _.each(depInfos, function (depInfo, packageName) {
 
-              var humanReadableSize = (function _getHumanReadableSize() {
-                if (depInfo.size > 1000000) {
-                  // return chalk.blue.dim('~')+chalk.blue(depInfo.size/1000000.0)+chalk.blue(' MB');
-                  return chalk.blue.dim('~')+chalk.blue( Math.floor((depInfo.size/1000000.0)*100)/100 )+chalk.blue(' MB');
-                }
-                else if (depInfo.size > 1000) {
-                  return chalk.blue.dim('~')+chalk.blue.dim( Math.floor((depInfo.size/1000.0)*100)/100 )+chalk.blue.dim(' KB');
-                }
-                else {
-                  return chalk.blue.dim('~')+chalk.gray(depInfo.size)+chalk.gray(' bytes');
-                }
-              })();
-
               // Figure out some facts about the installed version vs. semver range.
               var isDefinitelyNotPinned = (depInfo.semverRange[0]==='^' || depInfo.semverRange[0]==='~');
               var isSameVersion = (depInfo.semverRange === depInfo.installedVersion);
@@ -259,7 +236,7 @@ require('machine-as-script')({
 
               var column2 = (
                 // Size of installed package in the appropriate unit
-                humanReadableSize
+                getHumanReadableSize(depInfo.size)
               );
 
 
@@ -268,7 +245,8 @@ require('machine-as-script')({
                 column1 +
                 padding +
                 column2 +
-                '  ' + chalk.red(COLUMN_1_WIDTH + ' - ' + stripAnsi(column1).length + ' (vs '+column1.length+') ' + ' = ' + numPaddingChars + ' ::' + stripAnsi(column1))
+                ''
+                // '  ' + chalk.red(COLUMN_1_WIDTH + ' - ' + stripAnsi(column1).length + ' (vs '+column1.length+') ' + ' = ' + numPaddingChars + ' ::' + stripAnsi(column1))
               );
 
               console.log(consoleOutput);
@@ -280,24 +258,17 @@ require('machine-as-script')({
             });
 
             console.log();
-            var humanReadableSize = (function _getHumanReadableSize() {
-              if (totalSize > 1000000) {
-                return chalk.blue.dim('~')+chalk.blue.bold( Math.floor((totalSize/1000000.0)*100)/100 )+chalk.blue(' MB');
-              }
-              else if (totalSize > 1000) {
-                return chalk.blue.dim('~')+chalk.blue.dim.bold( Math.floor((totalSize/1000.0)*100)/100 )+chalk.blue.dim(' KB');
-              }
-              else {
-                return chalk.blue.dim('~')+chalk.gray.bold(totalSize)+chalk.gray(' bytes');
-              }
-            })();
-            console.log('Altogether, dependencies weigh in at ' + humanReadableSize);
+            console.log('Altogether, dependencies weigh in at ' + getHumanReadableSize(totalSize));
+            var COFFEE_SHOP_MEGABYTES_PER_SEC = 2;
+            var seconds = (totalSize/1000000) / COFFEE_SHOP_MEGABYTES_PER_SEC;
+            // console.log('seconds:',seconds);
+            console.log('(that will take an average of '+getHumanReadableDuration(seconds)+' on coffee shop internet)');
             console.log();
             console.log(chalk.dim(' (Note that `devDependencies` and `optionalDependencies` were NOT included above.)'));
             console.log();
 
             // Done!
-            return exits.success(depInfos);
+            return exits.success();
 
           });//</async.each() :: get info about dependencies>
 
