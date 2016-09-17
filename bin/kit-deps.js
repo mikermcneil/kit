@@ -8,6 +8,17 @@ require('machine-as-script')({
   extendedDescription: 'This only works with NPM 2.x (see [this issue](https://github.com/npm/npm/issues/10361) for more info).',
 
 
+  inputs: {
+
+    width: {
+      description: 'The width for the main column.',
+      example: 65,
+      defaultsTo: 65
+    }
+
+  },
+
+
   exits: {
 
     notAnNpmPackage: {
@@ -32,11 +43,14 @@ require('machine-as-script')({
     var path = require('path');
     var fs = require('fs');
     var _ = require('lodash');
+    var chalk = require('chalk');
+    var stripAnsi = require('strip-ansi');
     var async = require('async');
     var Filesystem = require('machinepack-fs');
     var Process = require('machinepack-process');
     var LocalMachinepacks = require('machinepack-localmachinepacks');
     var NPM = require('machinepack-npm');
+
 
     Filesystem.readJson({
       source: path.resolve('package.json'),
@@ -174,6 +188,115 @@ require('machine-as-script')({
           function afterwards(err) {
             if (err) { return exits.error(err); }
 
+
+            var totalSize = 0;
+
+
+            // Used for padding below.
+            var COLUMN_1_WIDTH = inputs.width;
+
+            _.each(depInfos, function (depInfo, packageName) {
+
+              var humanReadableSize = (function _getHumanReadableSize() {
+                if (depInfo.size > 1000000) {
+                  // return chalk.blue.dim('~')+chalk.blue(depInfo.size/1000000.0)+chalk.blue(' MB');
+                  return chalk.blue.dim('~')+chalk.blue( Math.floor((depInfo.size/1000000.0)*100)/100 )+chalk.blue(' MB');
+                }
+                else if (depInfo.size > 1000) {
+                  return chalk.blue.dim('~')+chalk.blue.dim( Math.floor((depInfo.size/1000.0)*100)/100 )+chalk.blue.dim(' KB');
+                }
+                else {
+                  return chalk.blue.dim('~')+chalk.gray(depInfo.size)+chalk.gray(' bytes');
+                }
+              })();
+
+              // Figure out some facts about the installed version vs. semver range.
+              var isDefinitelyNotPinned = (depInfo.semverRange[0]==='^' || depInfo.semverRange[0]==='~');
+              var isSameVersion = (depInfo.semverRange === depInfo.installedVersion);
+              var isMinVersion;
+              if (isDefinitelyNotPinned) {
+                isMinVersion = depInfo.semverRange.slice(1) === depInfo.installedVersion;
+              }
+              else {
+                isMinVersion = true;
+              }
+              var isDifferentEnoughToMaybeMatter = !isSameVersion && !isMinVersion;
+
+
+              // If version is definitely not pinned, mention that.
+              // (it might be fine-- if it's a dep you trust- but you still need to know)
+              // (
+              //   isDefinitelyNotPinned ?
+              //     chalk.green.dim('(not pinned)') :
+              //     ''
+              // )
+
+              var column1 = (
+                // Package name + installed version
+                (
+                  isDefinitelyNotPinned ?
+                    chalk.bold.green(packageName)+'@'+depInfo.installedVersion :
+                    chalk.bold(packageName)+'@'+depInfo.installedVersion
+                )+'  '+
+                // Draw semver range, but only if it's different enough from the actual
+                // installed version to maybe matter.
+                (
+                  isDifferentEnoughToMaybeMatter ?
+                    chalk.yellow.dim('('+depInfo.semverRange+')')+'   ' :
+                    ''
+                )
+              );
+
+
+              // Padding for readability
+              var padding = '';
+              var numPaddingChars = COLUMN_1_WIDTH - stripAnsi(column1).length;
+              // If we end up with a number <= 0, (i.e. because it's too long),
+              // then just skip ahead.
+              if (numPaddingChars > 0) {
+                padding = _.repeat(' ', numPaddingChars);
+              }
+
+              var column2 = (
+                // Size of installed package in the appropriate unit
+                humanReadableSize
+              );
+
+
+              // Build final console output.
+              var consoleOutput = (
+                column1 +
+                padding +
+                column2 +
+                '  ' + chalk.red(COLUMN_1_WIDTH + ' - ' + stripAnsi(column1).length + ' (vs '+column1.length+') ' + ' = ' + numPaddingChars + ' ::' + stripAnsi(column1))
+              );
+
+              console.log(consoleOutput);
+
+
+
+              totalSize += depInfo.size;
+
+            });
+
+            console.log();
+            var humanReadableSize = (function _getHumanReadableSize() {
+              if (totalSize > 1000000) {
+                return chalk.blue.dim('~')+chalk.blue.bold( Math.floor((totalSize/1000000.0)*100)/100 )+chalk.blue(' MB');
+              }
+              else if (totalSize > 1000) {
+                return chalk.blue.dim('~')+chalk.blue.dim.bold( Math.floor((totalSize/1000.0)*100)/100 )+chalk.blue.dim(' KB');
+              }
+              else {
+                return chalk.blue.dim('~')+chalk.gray.bold(totalSize)+chalk.gray(' bytes');
+              }
+            })();
+            console.log('Altogether, dependencies weigh in at ' + humanReadableSize);
+            console.log();
+            console.log(chalk.dim(' (Note that `devDependencies` and `optionalDependencies` were NOT included above.)'));
+            console.log();
+
+            // Done!
             return exits.success(depInfos);
 
           });//</async.each() :: get info about dependencies>
@@ -183,117 +306,4 @@ require('machine-as-script')({
     });//</Filesystem.readJson()>
   }
 
-}).exec({
-  success: function (depInfos){
-    var _ = require('lodash');
-    var chalk = require('chalk');
-
-    var totalSize = 0;
-
-
-    // Used for padding below.
-    var COLUMN_1_MAX_WIDTH = 50;
-
-    _.each(depInfos, function (depInfo, packageName) {
-
-      var humanReadableSize = (function _getHumanReadableSize() {
-        if (depInfo.size > 1000000) {
-          return chalk.blue.dim('~')+chalk.blue(depInfo.size/1000000.0)+chalk.blue(' MB');
-        }
-        else if (depInfo.size > 1000) {
-          return chalk.blue.dim('~')+chalk.blue(depInfo.size/1000.0)+chalk.blue(' kB');
-        }
-        else {
-          return chalk.blue.dim('~')+chalk.blue(depInfo.size)+chalk.blue(' bytes');
-        }
-      })();
-
-      // Figure out some facts about the installed version vs. semver range.
-      var isDefinitelyNotPinned = (depInfo.semverRange[0]==='^' || depInfo.semverRange[0]==='~');
-      var isSameVersion = (depInfo.semverRange === depInfo.installedVersion);
-      var isMinVersion;
-      if (isDefinitelyNotPinned) {
-        isMinVersion = depInfo.semverRange.slice(1) === depInfo.installedVersion;
-      }
-      else {
-        isMinVersion = true;
-      }
-      var isDifferentEnoughToMaybeMatter = !isSameVersion && !isMinVersion;
-
-
-      // If version is definitely not pinned, mention that.
-      // (it might be fine-- if it's a dep you trust- but you still need to know)
-      // (
-      //   isDefinitelyNotPinned ?
-      //     chalk.green.dim('(not pinned)') :
-      //     ''
-      // )
-
-      var column1 = (
-        // Package name + installed version
-        (
-          isDefinitelyNotPinned ?
-            chalk.bold.green(packageName)+'@'+depInfo.installedVersion :
-            chalk.bold(packageName)+'@'+depInfo.installedVersion
-        )+'  '+
-        // Draw semver range, but only if it's different enough from the actual
-        // installed version to maybe matter.
-        (
-          isDifferentEnoughToMaybeMatter ?
-            chalk.yellow.dim('(svr: '+depInfo.semverRange+')')+'   ' :
-            ''
-        )
-      );
-
-
-      // Padding for readability
-      var padding = '';
-      var numPaddingChars = COLUMN_1_MAX_WIDTH - column1.length;
-      // If we end up with a number <= 0, (i.e. because it's too long),
-      // then just skip ahead.
-      if (numPaddingChars > 0) {
-        padding = _.repeat(' ', numPaddingChars);
-      }
-
-      var column2 = (
-        // Size of installed package in the appropriate unit
-        humanReadableSize
-      );
-
-
-      // Build final console output.
-      var consoleOutput = (
-        column1 +
-        padding +
-        column2 +
-        '  ' + chalk.red(COLUMN_1_MAX_WIDTH + ' - ' + column1.length + ' = ' + numPaddingChars + ' ::' + column1)
-      );
-
-      console.log(consoleOutput);
-
-
-
-      totalSize += depInfo.size;
-
-    });
-
-    console.log();
-    var humanReadableSize = (function _getHumanReadableSize() {
-      if (totalSize > 1000000) {
-        return chalk.blue.dim('~')+chalk.blue.bold(totalSize/1000000.0)+chalk.blue(' MB');
-      }
-      else if (totalSize > 1000) {
-        return chalk.blue.dim('~')+chalk.blue.bold(totalSize/1000.0)+chalk.blue(' kB');
-      }
-      else {
-        return chalk.blue.dim('~')+chalk.blue.bold(totalSize)+chalk.blue(' bytes');
-      }
-    })();
-    console.log('Altogether, dependencies weigh in at ' + humanReadableSize);
-    console.log();
-    console.log(chalk.dim(' (Note that `devDependencies` and `optionalDependencies` were NOT included above.)'));
-    console.log();
-
-
-  }
-});
+}).exec();
