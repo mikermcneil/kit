@@ -5,7 +5,7 @@ require('machine-as-script')({
   friendlyName: 'kit deps',
 
 
-  extendedDescription: 'This only works with NPM 2.x.',
+  extendedDescription: 'This only works with NPM 2.x (see [this issue](https://github.com/npm/npm/issues/10361) for more info).',
 
 
   exits: {
@@ -22,7 +22,7 @@ require('machine-as-script')({
       'Each key in this result is a dep\'s package name, and each value is another dictionary consisting of:\n'+
       ' - the userland package\'s declared semver range (`semverRange`), indicating which versions of this dependency are supported\n'+
       ' - the actual installed version (`installedVersion`)\n'+
-      ' - the size of the installed dependency on disk (`size`)'
+      ' - the size of the installed dependency (`size`) -- note that this is the raw size in bytes-- not the "size on disk"'
     }
 
   },
@@ -85,10 +85,23 @@ require('machine-as-script')({
 
                   // If this is not a directory...
                   if (!stats.isDirectory()) {
+                    // console.log('• `'+item+'` is '+stats.size+' bytes');
                     return proceed(undefined, stats.size);
                   }// –•  Otherwise...
 
-                  var totalDirSize = stats.size;
+                  var totalDirSize = 0;
+                  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                  // ^
+                  // Note that we don't include the built-in size of directories (i.e. we don't do `var totalDirSize = stats.size`)
+                  // We're not calculating the "size on disk" here -- just the raw size.
+                  // In other words, doing it this way makes it match the first "size" displayed in Finder--
+                  // but not the "size on disk" (the part in parentheses).  Similarly, this doesn't give you the same results
+                  // as `du -h`, since that shows size on disk too.
+                  //
+                  // Anyway, all that's fine-- the point of this is to have a frame of reference of how big things are, and how
+                  // the total size of your package/app changes (%) as you make changes to your dependencies or package.json file.
+                  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 
                   fs.readdir(item, function (err, dirContents) {
                     if (err) return proceed(err);
@@ -99,12 +112,16 @@ require('machine-as-script')({
                       function iteratee(dirItem, next) {
                         // ›···Each item in this subdirectory···‹
 
+
+                        var dirItemPath = path.join(item, dirItem);
+
                         // Compute the size of each item in this subdirectory all of this  contents.
                         //
                         // > ƒ(…) | Make recursive call.
-                        _recurse(path.join(item, dirItem), function (err, size) {
+                        _recurse(dirItemPath, function (err, size) {
                           if (err) { return next(err); }
                           totalDirSize += size;
+                          // console.log('                    .–¬˛ `'+item+'` dir now has a total of '+totalDirSize+' bytes');
                           return next(err);
                         });//</made recusive call>
 
@@ -114,6 +131,7 @@ require('machine-as-script')({
                       function afterwards(err) {
                         if (err) { return proceed(err); }
 
+                        // console.log('.–¬˛ `'+item+'` is '+totalDirSize+' bytes');
                         return proceed(undefined, totalDirSize);
 
                       }
@@ -149,7 +167,7 @@ require('machine-as-script')({
                 return next();
 
               });//</Filesystem.readJson() :: read dependency's package.json file)>
-            });//</recursion (to figure out how big dependency is on disk)>
+            });//</recursion (to figure out how big dependency is, as far as bytes)>
           },//</‹···Each dep declared in the package.json file···›
 
           // ~∞%°  after async.each…
@@ -195,7 +213,7 @@ require('machine-as-script')({
             '(svr: '+depInfo.semverRange+')   ' :
             ''
         )+
-        // Size of installed package on disk
+        // Size of installed package in bytes
         humanReadableSize+'   '+
         chalk.gray('('+depInfo.size + ' bytes)')
       );
