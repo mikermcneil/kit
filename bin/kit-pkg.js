@@ -3,7 +3,7 @@
 require('machine-as-script')({
 
 
-  friendlyName: 'kit pkgversion',
+  friendlyName: 'kit pkg',
 
 
   exits: {

@@ -22,7 +22,8 @@ program
 
 // Set up commands
 program.usage(chalk.gray('[options]')+' '+chalk.bold('<command>'))
-.command('pkgversion', 'show the version of the package in the current directory')
+.command('pkg', 'show the version of the package in the current directory')
+.command('deps', 'get the install footprint + versions of this package\'s dependencies')
 .command('exclaim', 'convert a message to ASCII art and copy it to your clipboard')
 // .command('h1', 'create a heading for your JavaScript code')
 // .command('h2', 'create a sub-heading for your JavaScript code')
@@ -70,6 +71,10 @@ if ( _.isString(program.args[0]) ) {
 
   if (program.args[0] === 'h2') {
     return runAs('exclaim', { font: 'Calvin S', width: 35 });
+  }
+
+  if (program.args[0] === 'pkgversion') {
+    return runAs('pkg');
   }
 
   // ...
