@@ -36,10 +36,13 @@ https://github.com/mikermcneil/kit
 
   Commands:
 
-    exclaim      convert a message to ASCII art and copy it to your clipboard
-    pkgversion   show the version of the package in the current directory
-    about        what is kit?
-    help [cmd]   display help for [cmd]
+    pkg         show the version of the package in the current directory
+    deps        get the install footprint + versions of this package's dependencies
+    exclaim     convert a message to ASCII art and copy it to your clipboard
+    h1          exclaim a custom heading for your JavaScript code
+    h2          exclaim a custom sub-heading for your JavaScript code
+    about       what is kit?
+    help [cmd]  display help for [cmd]
 
   Options:
 
@@ -48,11 +51,11 @@ https://github.com/mikermcneil/kit
 
 ```
 
-## kit pkgversion
+## kit pkg
 
 ```bash
 ∑ cd /code/sails
-∑ kit pkgversion 
+∑ kit pkg 
 -----------------------------------------------------------------
 sails
 API-driven framework for building realtime apps, using MVC conventions (based on Express and Socket.io)
@@ -62,6 +65,30 @@ MIT License
 > http://npmjs.org/package/sails
 > http://github.com/balderdashy/sails/
 -----------------------------------------------------------------
+```
+
+
+
+## kit deps
+
+
+```bash
+∑ cd /code/machinepack-fs
+machinepack-fs: ∑ kit deps
+lodash.isobject@3.0.2                                            ~5.3 KB
+lodash.isfunction@3.0.8                                          ~5.96 KB
+rttc@9.3.4  (~9.3.0)                                             ~1.06 MB
+machine@13.0.0-11                                                ~577.34 KB
+walker@1.0.7                                                     ~17.09 KB
+machinepack-json@2.0.1  (~2.0.0)                                 ~1.51 MB
+machinepack-strings@5.0.0                                        ~2.26 MB
+machinepack-util@6.0.1  (~6.0.0)                                 ~2.51 MB
+fs-extra@0.30.0                                                  ~317.26 KB
+
+Altogether, dependencies weigh in at ~8.28 MB
+(that will take an average of ~4.14 seconds on coffee shop internet)
+
+ (Note that `devDependencies` and `optionalDependencies` were NOT included above.)
 ```
 
 
