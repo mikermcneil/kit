@@ -91,6 +91,8 @@ Altogether, dependencies weigh in at ~8.28 MB
  (Note that `devDependencies` and `optionalDependencies` were NOT included above.)
 ```
 
+![](https://cloud.githubusercontent.com/assets/618009/18611825/e7001e56-7d0c-11e6-91b1-30cc4c266d4b.png)
+
 
 
 ## kit exclaim
