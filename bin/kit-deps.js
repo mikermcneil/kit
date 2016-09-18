@@ -179,12 +179,23 @@ require('machine-as-script')({
             if (err) { return exits.error(err); }
 
 
+            // Calculate total size.
             var totalSize = 0;
+            _.each(depInfos, function (depInfo, packageName) {
+              totalSize += depInfo.size;
+            });
+
+
+            // Used for coffee shop download time calculations below.
+            var COFFEE_SHOP_MEGABYTES_PER_SEC = 2;
 
 
             // Used for padding below.
             var COLUMN_1_WIDTH = inputs.width;
+            var COLUMN_2_WIDTH = 15;
 
+
+            // Build and print output.
             _.each(depInfos, function (depInfo, packageName) {
 
               // Figure out some facts about the installed version vs. semver range.
@@ -226,43 +237,70 @@ require('machine-as-script')({
 
 
               // Padding for readability
-              var padding = '';
-              var numPaddingChars = COLUMN_1_WIDTH - stripAnsi(column1).length;
-              // If we end up with a number <= 0, (i.e. because it's too long),
-              // then just skip ahead.
-              if (numPaddingChars > 0) {
-                padding = _.repeat(' ', numPaddingChars);
-              }
+              var padding1 = (function (){
+                var padding = '';
+                var numPaddingChars = COLUMN_1_WIDTH - stripAnsi(column1).length;
+                // If we end up with a number <= 0, (i.e. because it's too long),
+                // then just skip ahead.
+                if (numPaddingChars > 0) {
+                  padding = _.repeat(' ', numPaddingChars);
+                }
+                // '  ' + chalk.red(COLUMN_1_WIDTH + ' - ' + stripAnsi(column1).length + ' (vs '+column1.length+') ' + ' = ' + numPaddingChars + ' ::' + stripAnsi(column1))
+                return padding;
+              })();
+
+
 
               var column2 = (
-                // Size of installed package in the appropriate unit
+
+                // Size of installed dep in the appropriate unit
                 getHumanReadableSize(depInfo.size)
+              );
+
+
+              // Padding for readability
+              var padding2 = (function (){
+                var padding = '';
+                var numPaddingChars = COLUMN_2_WIDTH - stripAnsi(column2).length;
+                // If we end up with a number <= 0, (i.e. because it's too long),
+                // then just skip ahead.
+                if (numPaddingChars > 0) {
+                  padding = _.repeat(' ', numPaddingChars);
+                }
+                return padding;
+              })();
+
+
+
+              // Calculate coffee shop seconds for this particular dep
+              var coffeeShopSeconds = Math.floor(( (depInfo.size/1000000) / COFFEE_SHOP_MEGABYTES_PER_SEC )*1000)/1000;
+
+              // Column 3
+              var column3 = (
+                // Time to download this dep on coffee shop internet
+                getHumanReadableDuration(coffeeShopSeconds)
               );
 
 
               // Build final console output.
               var consoleOutput = (
                 column1 +
-                padding +
+                padding1 +
                 column2 +
+                padding2 +
+                column3+
                 ''
-                // '  ' + chalk.red(COLUMN_1_WIDTH + ' - ' + stripAnsi(column1).length + ' (vs '+column1.length+') ' + ' = ' + numPaddingChars + ' ::' + stripAnsi(column1))
               );
 
               console.log(consoleOutput);
 
-
-
-              totalSize += depInfo.size;
-
-            });
+            });//</_.each() :: depInfos>
 
             console.log();
             console.log('Altogether, dependencies weigh in at ' + getHumanReadableSize(totalSize));
-            var COFFEE_SHOP_MEGABYTES_PER_SEC = 2;
-            var seconds = Math.floor(( (totalSize/1000000) / COFFEE_SHOP_MEGABYTES_PER_SEC )*100)/100;
-            // console.log('seconds:',seconds);
-            console.log('(that will take an average of '+getHumanReadableDuration(seconds)+' on coffee shop internet)');
+            // Calculate total coffee shop seconds
+            var totalCoffeeShopSeconds = Math.floor(( (totalSize/1000000) / COFFEE_SHOP_MEGABYTES_PER_SEC )*100)/100;
+            console.log('(that will take an average of '+getHumanReadableDuration(totalCoffeeShopSeconds)+' on coffee shop internet)');
             console.log();
             console.log(chalk.dim(' (Note that `devDependencies` and `optionalDependencies` were NOT included above.)'));
             console.log();

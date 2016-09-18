@@ -22,31 +22,27 @@ module.exports = function getHumanReadableDuration(durationInSeconds) {
 
   // >1 hr
   if (hours > 1) {
-    return chalk.dim('~')+chalk.yellow.bold(hours)+chalk.yellow(' hours');
-  }
-  // >30 mins
-  if (minutes > 10) {
-    return chalk.dim('~')+chalk.blue.bold(minutes)+chalk.blue(' minutes');
+    return chalk.dim('~')+chalk.red.bold(hours)+chalk.red(' hours');
   }
   // >10 mins
-  if (minutes > 1) {
-    return chalk.dim('~')+chalk.green.dim.bold(minutes)+chalk.green.dim(' minutes');
+  if (minutes > 10) {
+    return chalk.dim('~')+chalk.yellow.bold(minutes)+chalk.yellow(' minutes');
   }
   // >1 min
-  else if (minutes > 500) {
-    return chalk.dim('~')+chalk.cyan.dim.bold(minutes)+chalk.cyan.dim(' minutes');
+  else if (minutes > 1) {
+    return chalk.dim('~')+chalk.cyan.bold(minutes)+chalk.dim(' minutes');
   }
   // >15 secs
-  else if (durationInSeconds > 25) {
-    return chalk.dim('~')+chalk.blue.dim.bold(durationInSeconds)+chalk.blue.dim(' seconds');
+  else if (durationInSeconds > 15) {
+    return chalk.dim('~')+chalk.blue.bold(durationInSeconds)+chalk.dim(' seconds');
   }
   // >5 secs
-  else if (durationInSeconds > 1) {
-    return chalk.dim('~')+chalk.gray.dim.bold(durationInSeconds)+chalk.gray.dim(' seconds');
+  else if (durationInSeconds > 5) {
+    return chalk.dim('~')+chalk.cyan.dim.bold(durationInSeconds)+chalk.cyan.dim(' seconds');
   }
   // <=5 secs
   else {
-    return chalk.dim('~')+chalk.dim.bold(durationInSeconds)+chalk.dim(' seconds');
+    return chalk.dim('~')+chalk.gray.dim.bold(durationInSeconds)+chalk.gray.dim(' seconds');
   }
 };
 
