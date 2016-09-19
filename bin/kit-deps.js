@@ -10,10 +10,120 @@ require('machine-as-script')({
 
   inputs: {
 
-    width: {
-      description: 'The width for the main column.',
-      example: 65,
-      defaultsTo: 65
+    verifiedReleases: {
+      description: 'A dictionary mapping package names of common dependencies to the version string of a verified release.',
+      extendedDescription:
+      'On the Sails.js team, we prefer to pin the versions of 3rd party dependencies \n'+
+      'from outside of the project, just because we\'ve been burned on more than one occasion \n'+
+      'by patch or minor releases breaking functionality.  But while pinning depenency versions \n'+
+      'is great for maintainability, security, and stability, it does have the effect of defeating \n'+
+      'a powerful, built-in download size optimization in NPM. \n'+
+      '\n'+
+      'So, for certain *common* dependencies, like async and lodash, we\'re moving towards \n'+
+      'standardizing the pinned version number across all of our modules.  This reduces overall \n'+
+      '`npm install` time, makes for a more optimized bundle when browserifying, and, in general, \n'+
+      'makes packages easier to understand and troubleshoot. \n'+
+      '\n'+
+      'This is a dictionary of those "verified" versions for *common deps*. \n'+
+      '',
+      example: {},
+      defaultsTo: {
+        'async': '2.0.1',
+        'lodash': '3.10.1',
+        'debug': '2.1.2',
+        'chalk': '1.1.3',
+
+        'commander': '2.8.1',
+        'knex': '0.11.9',
+
+        'bcryptjs': '2.3.0',
+        'connect-redis': '3.1.0',
+
+        'ejs': '2.3.4',
+        'grunt': '1.0.1',
+        'grunt-cli': '1.2.0',
+        'grunt-contrib-clean': '1.0.0',
+        'grunt-contrib-coffee': '1.0.0',
+        'grunt-contrib-concat': '1.0.1',
+        'grunt-contrib-copy': '1.0.0',
+        'grunt-contrib-cssmin': '1.0.1',
+        'grunt-contrib-jst': '1.0.0',
+        'grunt-contrib-less': '1.3.0',
+        'grunt-contrib-uglify': '1.0.1',
+        'grunt-contrib-watch': '1.0.0',
+        'grunt-hash': '0.5.0',
+        'grunt-sails-linker': '0.10.1',
+        'grunt-sync': '0.5.2',
+        'rc': '1.0.1',
+        // This is not a complete list.
+        // (TODO: add to this list over time)
+      }
+    },
+
+    trustedReleases: {
+      description: 'A set of trusted releases of internal packages. Loose semver ranges will be tolerated as long as they match the specified semver range.',
+      extendedDescription:
+      'There are also certain dependencies which our team directly maintains.\n'+
+      '\n'+
+      'Since we have the direct ability to publish patches, we are ultimately responsible for\n'+
+      'ensuring that those dependencies use proper semantic versioning.  In an effort to keep\n'+
+      'us honest and make sure that we only break features on major version bumps, we use loose\n'+
+      'semver ranges for our internal dependencies as much as possible.\n'+
+      '\n'+
+      'This is not by any means a complete list-- it just has a few of the most commonly-used\n'+
+      'packages that we maintain.  It will be expanded over time.\n'+
+      '',
+      example: {},
+      defaultsTo: {
+        'sails': '*',
+
+        'waterline': '*',
+        'sails-disk': '*',
+        'sails-postgresql': '0.11.4',
+
+        'skipper': '*',
+        'skipper-disk': '*',
+
+        'sails-stdlib': '*',
+        'stdlib': '*',
+        'machinepack-ifthen': '*',
+        'machinepack-strings': '*',
+        'machinepack-numbers': '*',
+        'machinepack-booleans': '*',
+        'machinepack-dictionaries': '*',
+        'machinepack-arrays': '*',
+        'machinepack-json': '*',
+        'machinepack-datetime': '*',
+        'machinepack-math': '*',
+        'machinepack-paths': '*',
+        'machinepack-urls': '*',
+        'machinepack-emailaddresses': '*',
+        'machinepack-fs': '*',
+        'machinepack-http': '*',
+        'machinepack-process': '*',
+        'machinepack-console': '*',
+        'machinepack-util': '*',
+        'machinepack-waterline': '*',
+        'machinepack-sockets': '*',
+        'machinepack-reqres': '*',
+        'machinepack-sessionauth': '*',
+        'machinepack-passwords': '*',
+        'machinepack-mailgun': '*',
+        'machinepack-gravatar': '*',
+        'machinepack-sails': '*',
+
+        'anchor': '*',
+        'machine': '*',
+        'rttc': '*',
+        'aim-error-at': '*',
+
+        'browserify-transform-machinepack': '*',
+        'test-machinepack-mocha': '*',
+        'test-machinepack': '*',
+
+        // This is not a complete list
+        // (TODO: add to this list and expand ranges as it makes sense, over time)
+      }
     }
 
   },
@@ -42,6 +152,17 @@ require('machine-as-script')({
     var getHumanReadableSize = require('../helpers/get-human-readable-size');
     var getHumanReadableDuration = require('../helpers/get-human-readable-duration');
 
+
+    // A dictionary mapping the package names of common dependencies to the version number of a verified release.
+    var VERIFIED_RELEASES_OF_COMMON_DEPS = inputs.verifiedReleases;
+
+
+    // A set of trusted package names.
+    // (loose semver ranges will be tolerated, as long as they are compatible with the specified semver range.)
+    var TRUSTED_RELEASES_OF_CORE_DEPS = inputs.trustedReleases;
+
+
+
     Filesystem.readJson({
       source: path.resolve('package.json'),
       schema: {},
@@ -51,11 +172,11 @@ require('machine-as-script')({
         return exits.error(err);
       },
       // No file exists at the provided `source` path
-      doesNotExist: function() {
+      doesNotExist: function(err) {
         return exits.notAnNpmPackage(err);
       },
       // Could not parse file as JSON.
-      couldNotParse: function() {
+      couldNotParse: function(err) {
         return exits.notAnNpmPackage(err);
       },
       // OK.
@@ -72,6 +193,14 @@ require('machine-as-script')({
           async.each(_.keys(packageMeta.dependencies), function (packageName, next) {
             // ›···Each dep declared in the package.json file···‹
 
+
+
+            //  ┌─┐┌─┐┬  ┌─┐┬ ┬┬  ┌─┐┌┬┐┌─┐  ┬ ┬┌─┐┬ ┬  ┌┐ ┬┌─┐
+            //  │  ├─┤│  │  │ ││  ├─┤ │ ├┤   ├─┤│ ││││  ├┴┐││ ┬
+            //  └─┘┴ ┴┴─┘└─┘└─┘┴─┘┴ ┴ ┴ └─┘  ┴ ┴└─┘└┴┘  └─┘┴└─┘
+            //  ┌─    ┬─┐┌─┐┌─┐┬ ┬┬─┐┌─┐┬┬  ┬┌─┐    ─┐
+            //  │───  ├┬┘├┤ │  │ │├┬┘└─┐│└┐┌┘├┤   ───│
+            //  └─    ┴└─└─┘└─┘└─┘┴└─└─┘┴ └┘ └─┘    ─┘
             var absPathToDep = path.resolve('node_modules/', packageName);
 
             // Look it up on disk and figure out how big.
@@ -108,7 +237,7 @@ require('machine-as-script')({
 
 
                   fs.readdir(item, function (err, dirContents) {
-                    if (err) return proceed(err);
+                    if (err) { return proceed(err); }
 
                     // Sum the sizes of each file/folder in this directory.
                     async.each(
@@ -165,7 +294,22 @@ require('machine-as-script')({
                 depInfos[packageName] = {
                   semverRange: packageMeta.dependencies[packageName],
                   installedVersion: dependencyPkgMD.version,
-                  size: total
+
+                  isCommon: !_.isUndefined(VERIFIED_RELEASES_OF_COMMON_DEPS[packageName]),
+                  verifiedReleaseVersion: VERIFIED_RELEASES_OF_COMMON_DEPS[packageName] || '',
+                  isInstalledVersionVerified:
+                    !_.isUndefined(VERIFIED_RELEASES_OF_COMMON_DEPS[packageName]) ?
+                      VERIFIED_RELEASES_OF_COMMON_DEPS[packageName] === dependencyPkgMD.version :
+                      false,
+
+                  isCore: !_.isUndefined(TRUSTED_RELEASES_OF_CORE_DEPS[packageName]),
+                  trustedSemverRange: TRUSTED_RELEASES_OF_CORE_DEPS[packageName],
+                  isInstalledVersionTrusted:
+                    !_.isUndefined(TRUSTED_RELEASES_OF_CORE_DEPS[packageName]) ?
+                      NPM.isVersionCompatible({ version: dependencyPkgMD.version, semverRange: TRUSTED_RELEASES_OF_CORE_DEPS[packageName] }).execSync() :
+                      false,
+
+                  size: total,
                 };
 
                 return next();
@@ -179,7 +323,14 @@ require('machine-as-script')({
             if (err) { return exits.error(err); }
 
 
-            // Calculate total size.
+            //  ┬─┐┌─┐┬  ┬    ┬ ┬┌─┐  ┬┌┐┌┌─┐┌─┐
+            //  ├┬┘│ ││  │    │ │├─┘  ││││├┤ │ │
+            //  ┴└─└─┘┴─┘┴─┘  └─┘┴    ┴┘└┘└  └─┘
+            //  ┌─    ┌─┐┌┐ ┌─┐┬ ┬┌┬┐  ╔═╗╦  ╦    ╔╦╗╔═╗╔═╗╔═╗    ─┐
+            //  │───  ├─┤├┴┐│ ││ │ │   ╠═╣║  ║     ║║║╣ ╠═╝╚═╗  ───│
+            //  └─    ┴ ┴└─┘└─┘└─┘ ┴   ╩ ╩╩═╝╩═╝  ═╩╝╚═╝╩  ╚═╝    ─┘
+
+            // Calculate total size of all dependencies.
             var totalSize = 0;
             _.each(depInfos, function (depInfo, packageName) {
               totalSize += depInfo.size;
@@ -191,9 +342,12 @@ require('machine-as-script')({
 
 
             // Used for padding below.
-            var COLUMN_1_WIDTH = inputs.width;
-            var COLUMN_2_WIDTH = 15;
+            var COLUMN_1_MAX_WIDTH = 75;
+            var COLUMN_2_MAX_WIDTH = 15;
 
+
+            // Used for storing output that will be logged below.
+            var outputTable = [];
 
             // Build and print output.
             _.each(depInfos, function (depInfo, packageName) {
@@ -211,43 +365,85 @@ require('machine-as-script')({
               var isDifferentEnoughToMaybeMatter = !isSameVersion && !isMinVersion;
 
 
-              // If version is definitely not pinned, mention that.
-              // (it might be fine-- if it's a dep you trust- but you still need to know)
-              // (
-              //   isDefinitelyNotPinned ?
-              //     chalk.green.dim('(not pinned)') :
-              //     ''
-              // )
 
-              var column1 = (
-                // Package name + installed version
-                (
-                  isDefinitelyNotPinned ?
-                    chalk.bold.green(packageName)+'@'+depInfo.installedVersion :
-                    chalk.bold(packageName)+'@'+depInfo.installedVersion
-                )+'  '+
-                // Draw semver range, but only if it's different enough from the actual
-                // installed version to maybe matter.
-                (
-                  isDifferentEnoughToMaybeMatter ?
-                    chalk.yellow.dim('('+depInfo.semverRange+')')+'   ' :
-                    ''
-                )
-              );
+              var column1 = '';
 
 
-              // Padding for readability
-              var padding1 = (function (){
-                var padding = '';
-                var numPaddingChars = COLUMN_1_WIDTH - stripAnsi(column1).length;
-                // If we end up with a number <= 0, (i.e. because it's too long),
-                // then just skip ahead.
-                if (numPaddingChars > 0) {
-                  padding = _.repeat(' ', numPaddingChars);
+              // Package name
+              if (depInfo.isCore) {
+                column1 += chalk.bold.green(packageName);
+              }
+              else {
+                column1 += chalk.bold(packageName);
+              }
+
+
+              // Installed version & semver range
+              // ========================================================================
+              // Core deps
+              if (depInfo.isInstalledVersionTrusted) {
+                // Installed version is a trusted release of a core dependency!
+                column1 += chalk.green('@'+depInfo.installedVersion);
+              }
+              // Common deps
+              else if (depInfo.isCommon) {
+                if (depInfo.isInstalledVersionVerified) {
+                  // Installed version is the verified/recommended one!
+                  column1 += chalk.green('@'+depInfo.installedVersion);
                 }
-                // '  ' + chalk.red(COLUMN_1_WIDTH + ' - ' + stripAnsi(column1).length + ' (vs '+column1.length+') ' + ' = ' + numPaddingChars + ' ::' + stripAnsi(column1))
-                return padding;
-              })();
+                else {
+                  // Installed version is NOT the verified/recommended one.
+                  column1 += chalk.yellow('@'+depInfo.installedVersion);
+                }
+              }
+              // Misc deps
+              else {
+                // Installed version might or might not be ok...
+                //
+                // If this is DEFINITELY not a pinned dependency (meaning it is a loose semver range...)
+                if (isDefinitelyNotPinned) {
+                  column1 += '@'+depInfo.installedVersion;
+                }
+                // Otherwise, it's probably a pinned dependency version, which means it's probably fine.
+                else {
+                  column1 += '@'+depInfo.installedVersion;
+                }
+              }
+
+              // >-
+              column1 += '  ';
+
+              // Draw semver range, but only if it's different enough from the actual
+              // installed version to maybe matter.
+              //
+              // > If version is definitely not pinned, we mention that.
+              // > (it might be fine-- if it's a dep you trust- but you still need to know)
+              if (isDifferentEnoughToMaybeMatter) {
+
+                // If this is a core dependency, and the installed version is in the
+                // trusted semver range, even though the installed version is different
+                // from the range, draw the range subtly.
+                if (depInfo.isInstalledVersionTrusted) {
+                  column1 += chalk.green.dim('('+depInfo.semverRange+')')+'   ';
+                }
+                // If this is a common dependency...
+                else if (depInfo.isCommon) {
+                  // Even if installed version is verified, since semver range is not pinned,
+                  // draw it kind of angry.
+                  if (depInfo.isInstalledVersionVerified) {
+                    column1 += chalk.yellow('('+depInfo.semverRange+')')+'   ';
+                  }
+                  // If installed version is NOT verified, draw it even more angry!
+                  else if (depInfo.isCommon && !depInfo.isInstalledVersionVerified) {
+                    column1 += chalk.red('('+depInfo.semverRange+')')+'   ';
+                  }
+                }
+                // Otherwise, draw it kind of angry.
+                else {
+                  column1 += chalk.yellow('('+depInfo.semverRange+')')+'   ';
+                }
+              }// >-
+
 
 
 
@@ -256,19 +452,6 @@ require('machine-as-script')({
                 // Size of installed dep in the appropriate unit
                 getHumanReadableSize(depInfo.size)
               );
-
-
-              // Padding for readability
-              var padding2 = (function (){
-                var padding = '';
-                var numPaddingChars = COLUMN_2_WIDTH - stripAnsi(column2).length;
-                // If we end up with a number <= 0, (i.e. because it's too long),
-                // then just skip ahead.
-                if (numPaddingChars > 0) {
-                  padding = _.repeat(' ', numPaddingChars);
-                }
-                return padding;
-              })();
 
 
 
@@ -281,20 +464,54 @@ require('machine-as-script')({
                 getHumanReadableDuration(coffeeShopSeconds)
               );
 
+              outputTable.push([
+                column1,
+                column2,
+                column3
+              ]);
 
-              // Build final console output.
-              var consoleOutput = (
-                column1 +
+
+            });//</_.each() :: depInfos>
+
+
+            var maxCol1Width = Math.min(COLUMN_1_MAX_WIDTH, _.max(_.map(outputTable, function eachRow(columns){ return stripAnsi(columns[0]).length; })));
+            var maxCol2Width = Math.min(COLUMN_2_MAX_WIDTH, _.max(_.map(outputTable, function eachRow(columns){ return stripAnsi(columns[1]).length; })));
+            var MIN_PADDING = 2;
+            // console.log('maxCol1Width',maxCol1Width);
+            // console.log('maxCol2Width',maxCol2Width);
+
+            _.each(outputTable, function eachRow(columns){
+
+              // Padding for readability
+              var padding1 = (function (){
+                var padding = '';
+                var numPaddingChars = maxCol1Width - stripAnsi(columns[0]).length + MIN_PADDING;
+                // If we end up with a number <= 0, (i.e. because it's too long),
+                // then just act like it's empty string.  (Lodash does this automatically.)
+                padding = _.repeat(' ', numPaddingChars);
+                return padding;
+              })();
+
+              var padding2 = (function (){
+                var padding = '';
+                var numPaddingChars = maxCol2Width - stripAnsi(columns[1]).length + MIN_PADDING;
+                // If we end up with a number <= 0, (i.e. because it's too long),
+                // then just act like it's empty string.  (Lodash does this automatically.)
+                padding = _.repeat(' ', numPaddingChars);
+                return padding;
+              })();
+
+              console.log(
+                columns[0] +
                 padding1 +
-                column2 +
+                columns[1] +
                 padding2 +
-                column3+
+                columns[2]+
                 ''
               );
 
-              console.log(consoleOutput);
+            });
 
-            });//</_.each() :: depInfos>
 
             console.log();
             console.log('Altogether, dependencies weigh in at ' + getHumanReadableSize(totalSize));
