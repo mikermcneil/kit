@@ -20,33 +20,67 @@ module.exports = function getHumanReadableSize(sizeInBytes) {
   var sizeInMegabytes = Math.floor((sizeInBytes/APRX_BYTES_IN_MB)*100)/100;
   var sizeInKilobytes = Math.floor((sizeInBytes/APRX_BYTES_IN_KB)*100)/100;
 
-  // >50MB
-  if (sizeInMegabytes > 50) {
-    return chalk.dim('~')+chalk.yellow.bold(sizeInMegabytes)+chalk.yellow(' MB');
+  var chalkToUse;
+  var unitsStr;
+
+
+  // >500MB
+  if (sizeInMegabytes > 500) {
+    chalkToUse = chalk.yellow.bgRed;
+    unitsStr = 'MB';
   }
-  // >10MB
-  if (sizeInMegabytes > 10) {
-    return chalk.dim('~')+chalk.blue.bold(sizeInMegabytes)+chalk.blue(' MB');
+  // >250MB
+  else if (sizeInMegabytes > 250) {
+    chalkToUse = chalk.white.bgRed;
+    unitsStr = 'MB';
+  }
+  // >150MB
+  else if (sizeInMegabytes > 150) {
+    chalkToUse = chalk.red;
+    unitsStr = 'MB';
+  }
+  // >50MB
+  else if (sizeInMegabytes > 50) {
+    chalkToUse = chalk.yellow;
+    unitsStr = 'MB';
+  }
+  // >5MB
+  else if (sizeInMegabytes > 5) {
+    chalkToUse = chalk.reset;
+    unitsStr = 'MB';
   }
   // >1MB
-  if (sizeInMegabytes > 1) {
-    return chalk.dim('~')+chalk.green.dim.bold(sizeInMegabytes)+chalk.green.dim(' MB');
+  else if (sizeInMegabytes > 1) {
+    chalkToUse = chalk.yellow.dim;
+    unitsStr = 'MB';
   }
   // >500KB
   else if (sizeInKilobytes > 500) {
-    return chalk.dim('~')+chalk.cyan.dim.bold(sizeInKilobytes)+chalk.cyan.dim(' KB');
+    chalkToUse = chalk.gray;
+    unitsStr = 'KB';
   }
   // >25KB
   else if (sizeInKilobytes > 25) {
-    return chalk.dim('~')+chalk.blue.dim.bold(sizeInKilobytes)+chalk.blue.dim(' KB');
+    chalkToUse = chalk.dim;
+    unitsStr = 'KB';
   }
-  // >1KB
-  else if (sizeInKilobytes > 1) {
-    return chalk.dim('~')+chalk.gray.dim.bold(sizeInKilobytes)+chalk.gray.dim(' KB');
-  }
-  // <=1KB
+  // <=25KB
   else {
-    return chalk.dim('~')+chalk.dim.bold(sizeInBytes)+chalk.dim(' bytes');
+    chalkToUse = chalk.gray.dim;
+    unitsStr = 'KB';
+  }
+
+
+
+  // Return final output.
+  if (unitsStr === 'MB') {
+    return chalkToUse.bold(sizeInMegabytes)+chalkToUse(' MB');
+  }
+  else if (unitsStr === 'KB') {
+    return chalkToUse.bold(sizeInKilobytes)+chalkToUse(' KB');
+  }
+  else {
+    return chalkToUse.bold(bytes)+chalkToUse(' bytes');
   }
 };
 

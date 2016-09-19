@@ -115,11 +115,16 @@ require('machine-as-script')({
         'anchor': '*',
         'machine': '*',
         'rttc': '*',
-        'aim-error-at': '*',
 
+        'aim-error-at': '*',
+        'machine-as-script': '*',
+        'machine-as-action': '*',
         'browserify-transform-machinepack': '*',
         'test-machinepack-mocha': '*',
         'test-machinepack': '*',
+
+        'machinepack-npm': '*',
+        'machinepack-localmachinepacks': '*',
 
         // This is not a complete list
         // (TODO: add to this list and expand ranges as it makes sense, over time)
@@ -369,31 +374,32 @@ require('machine-as-script')({
               var column1 = '';
 
 
-              // Package name
-              if (depInfo.isCore) {
-                column1 += chalk.bold.green(packageName);
-              }
-              else {
-                column1 += chalk.bold(packageName);
-              }
 
 
-              // Installed version & semver range
+              // Package name, installed version, & semver range
               // ========================================================================
               // Core deps
               if (depInfo.isInstalledVersionTrusted) {
                 // Installed version is a trusted release of a core dependency!
-                column1 += chalk.green('@'+depInfo.installedVersion);
+                column1 += chalk.green('  ');
+                // column1 += chalk.green('✓ ');
+                if (depInfo.isCore) { column1 += chalk.reset(packageName); } else { column1 += chalk.reset(packageName); }
+                column1 += chalk.reset('@'+depInfo.installedVersion);
               }
               // Common deps
               else if (depInfo.isCommon) {
                 if (depInfo.isInstalledVersionVerified) {
                   // Installed version is the verified/recommended one!
-                  column1 += chalk.green('@'+depInfo.installedVersion);
+                  column1 += chalk.green('  ');
+                  // column1 += chalk.green('✓ ');
+                  if (depInfo.isCore) { column1 += chalk.reset(packageName); } else { column1 += chalk.reset(packageName); }
+                  column1 += chalk.reset('@'+depInfo.installedVersion);
                 }
                 else {
                   // Installed version is NOT the verified/recommended one.
-                  column1 += chalk.yellow('@'+depInfo.installedVersion);
+                  column1 += chalk.bold.red('✗ ');
+                  if (depInfo.isCore) { column1 += chalk.reset(packageName); } else { column1 += chalk.reset(packageName); }
+                  column1 += chalk.reset('@'+depInfo.installedVersion);
                 }
               }
               // Misc deps
@@ -402,47 +408,72 @@ require('machine-as-script')({
                 //
                 // If this is DEFINITELY not a pinned dependency (meaning it is a loose semver range...)
                 if (isDefinitelyNotPinned) {
-                  column1 += '@'+depInfo.installedVersion;
+                  column1 += chalk.bold.yellow('! ');
+                  if (depInfo.isCore) { column1 += chalk.reset(packageName); } else { column1 += chalk.reset(packageName); }
+                  column1 += chalk.reset('@'+depInfo.installedVersion);
                 }
                 // Otherwise, it's probably a pinned dependency version, which means it's probably fine.
                 else {
-                  column1 += '@'+depInfo.installedVersion;
+                  column1 += chalk.dim('  ');
+                  if (depInfo.isCore) { column1 += chalk.reset(packageName); } else { column1 += chalk.reset(packageName); }
+                  column1 += chalk.reset('@'+depInfo.installedVersion);
                 }
               }
 
               // >-
               column1 += '  ';
 
-              // Draw semver range, but only if it's different enough from the actual
-              // installed version to maybe matter.
+
+              // Draw semver range.
               //
               // > If version is definitely not pinned, we mention that.
               // > (it might be fine-- if it's a dep you trust- but you still need to know)
-              if (isDifferentEnoughToMaybeMatter) {
+              //
 
-                // If this is a core dependency, and the installed version is in the
-                // trusted semver range, even though the installed version is different
-                // from the range, draw the range subtly.
-                if (depInfo.isInstalledVersionTrusted) {
-                  column1 += chalk.green.dim('('+depInfo.semverRange+')')+'   ';
+              // If this is a core dependency, and the installed version is in the
+              // trusted semver range, even though the installed version is different
+              // from the range, draw the range subtly.
+              if (depInfo.isInstalledVersionTrusted) {
+                if (isDifferentEnoughToMaybeMatter) {
+                  column1 += chalk.dim('('+depInfo.semverRange+')')+'   ';
                 }
-                // If this is a common dependency...
-                else if (depInfo.isCommon) {
-                  // Even if installed version is verified, since semver range is not pinned,
-                  // draw it kind of angry.
-                  if (depInfo.isInstalledVersionVerified) {
-                    column1 += chalk.yellow('('+depInfo.semverRange+')')+'   ';
-                  }
-                  // If installed version is NOT verified, draw it even more angry!
-                  else if (depInfo.isCommon && !depInfo.isInstalledVersionVerified) {
-                    column1 += chalk.red('('+depInfo.semverRange+')')+'   ';
+                // otherwise no need to say anything
+              }
+              // If this is a common dependency...
+              else if (depInfo.isCommon) {
+
+                if (depInfo.isInstalledVersionVerified) {
+                  if (isDefinitelyNotPinned) {
+                    column1 += chalk.yellow('(should be pinned @'+depInfo.verifiedReleaseVersion+')')+'   ';
                   }
                 }
-                // Otherwise, draw it kind of angry.
                 else {
-                  column1 += chalk.yellow('('+depInfo.semverRange+')')+'   ';
+                  if (isDefinitelyNotPinned) {
+                    column1 += chalk.red('(should be pinned @'+depInfo.verifiedReleaseVersion+')')+'   ';
+                  }
+                  else {
+                    column1 += chalk.red('(should instead be pinned @'+depInfo.verifiedReleaseVersion+')')+'   ';
+                  }
                 }
-              }// >-
+              }
+              // Otherwise, draw it kind of angry.
+              else {
+                if (isDefinitelyNotPinned) {
+                  if (isDifferentEnoughToMaybeMatter) {
+                    column1 += chalk.yellow('not pinned ('+depInfo.semverRange+')')+'   ';
+                  }
+                  else {
+                    column1 += chalk.yellow('not pinned ('+depInfo.semverRange+')')+'   ';
+                  }
+                }
+                else if (isDifferentEnoughToMaybeMatter) {
+                  column1 += chalk.dim('('+depInfo.semverRange+')')+'   ';
+                }
+                // otherwise no need to say anything
+              }
+
+
+              // >-
 
 
 

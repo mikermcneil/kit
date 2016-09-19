@@ -10,51 +10,76 @@ var chalk = require('chalk');
  *
  * TODO: pull this into a well-formed machine
  *
- * @param {Numinuteser} durationInSeconds
+ * @param {Numinuteser} seconds
  * @returns {String}
  */
-module.exports = function getHumanReadableDuration(durationInSeconds) {
+module.exports = function getHumanReadableDuration(seconds) {
   var SECONDS_IN_MINUTE = 60;
   var SECONDS_IN_HOUR = 60 * 60;
 
-  var hours = Math.floor((durationInSeconds/SECONDS_IN_HOUR)*100)/100;
-  var minutes = Math.floor((durationInSeconds/SECONDS_IN_MINUTE)*100)/100;
+  var hours = Math.floor((seconds/SECONDS_IN_HOUR)*100)/100;
+  var minutes = Math.floor((seconds/SECONDS_IN_MINUTE)*100)/100;
+
+  var chalkToUse;
+  var unitsStr;
 
   // >1 hr
   if (hours > 1) {
-    return chalk.dim('~')+chalk.white.bgRed.bold(hours)+chalk.white.bgRed(' hours');
+    chalkToUse = chalk.yellow.bgRed;
+    unitsStr = 'hours';
   }
   // >10 mins
-  if (minutes > 10) {
-    return chalk.dim('~')+chalk.red.bold(minutes)+chalk.red(' minutes');
+  else if (minutes > 10) {
+    chalkToUse = chalk.white.bgRed;
+    unitsStr = 'minutes';
   }
-  // >1 min
-  else if (minutes > 1) {
-    return chalk.dim('~')+chalk.yellow.bold(minutes)+chalk.yellow(' minutes');
-  }
-  // >30 secs
-  else if (durationInSeconds > 30) {
-    return chalk.dim('~')+chalk.cyan.underline.bold(durationInSeconds)+chalk.cyan.underline(' seconds');
+  // >2 mins
+  else if (minutes > 2) {
+    chalkToUse = chalk.red;
+    unitsStr = 'minutes';
   }
   // >15 secs
-  else if (durationInSeconds > 15) {
-    return chalk.dim('~')+chalk.cyan.bold(durationInSeconds)+chalk.cyan(' seconds');
+  else if (seconds > 15) {
+    chalkToUse = chalk.yellow;
+    unitsStr = 'seconds';
   }
   // >5 secs
-  else if (durationInSeconds > 5) {
-    return chalk.dim('~')+chalk.blue.bold(durationInSeconds)+chalk.blue(' seconds');
+  else if (seconds > 5) {
+    chalkToUse = chalk.reset;
+    unitsStr = 'seconds';
   }
-  // >2 secs
-  else if (durationInSeconds > 2) {
-    return chalk.dim('~')+chalk.green.dim.bold(durationInSeconds)+chalk.green.dim(' seconds');
+  // >1 secs
+  else if (seconds > 1) {
+    chalkToUse = chalk.yellow.dim;
+    unitsStr = 'seconds';
   }
   // >0.5 secs
-  else if (durationInSeconds > 0.5) {
-    return chalk.dim('~')+chalk.blue.dim.bold(durationInSeconds)+chalk.blue.dim(' seconds');
+  else if (seconds > 0.5) {
+    chalkToUse = chalk.gray;
+    unitsStr = 'seconds';
   }
-  // <=0.5 sec
+  // >0.125 secs
+  else if (seconds > 0.125) {
+    chalkToUse = chalk.dim;
+    unitsStr = 'seconds';
+  }
+  // <=0.125 sec
   else {
-    return chalk.dim('~')+chalk.gray.dim.bold(durationInSeconds)+chalk.gray.dim(' seconds');
+    chalkToUse = chalk.gray.dim;
+    unitsStr = 'seconds';
   }
+
+
+  // Return final output.
+  if (unitsStr === 'hours') {
+    return chalkToUse.bold(hours)+chalkToUse(' hours');
+  }
+  else if (unitsStr === 'minutes') {
+    return chalkToUse.bold(minutes)+chalkToUse(' minutes');
+  }
+  else {
+    return chalkToUse.bold(seconds)+chalkToUse(' seconds');
+  }
+
 };
 
