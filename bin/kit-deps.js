@@ -30,7 +30,7 @@ require('machine-as-script')({
       defaultsTo: {
         'async': '2.0.1',
         'lodash': '3.10.1',
-        'debug': '2.1.2',
+        'debug': '2.2.0',
         'chalk': '1.1.3',
 
         'commander': '2.8.1',
@@ -84,6 +84,9 @@ require('machine-as-script')({
         'skipper': '*',
         'skipper-disk': '*',
 
+        'include-all': '*',
+        'sails.io.js': '*',
+
         'sails-stdlib': '*',
         'stdlib': '*',
         'machinepack-ifthen': '*',
@@ -115,6 +118,7 @@ require('machine-as-script')({
         'anchor': '*',
         'machine': '*',
         'rttc': '*',
+        'switchback': '*',
 
         'aim-error-at': '*',
         'machine-as-script': '*',
@@ -294,31 +298,38 @@ require('machine-as-script')({
                 schema: {}
               }).exec(function (err, dependencyPkgMD) {
                 if (err) { return next(err); }
+                try {
 
-                // Finally build the depInfo dictionary for this dependency.
-                depInfos[packageName] = {
-                  semverRange: packageMeta.dependencies[packageName],
-                  installedVersion: dependencyPkgMD.version,
+                  // Finally build the depInfo dictionary for this dependency.
+                  depInfos[packageName] = {
+                    semverRange: packageMeta.dependencies[packageName],
+                    installedVersion: dependencyPkgMD.version,
 
-                  isCommon: !_.isUndefined(VERIFIED_RELEASES_OF_COMMON_DEPS[packageName]),
-                  verifiedReleaseVersion: VERIFIED_RELEASES_OF_COMMON_DEPS[packageName] || '',
-                  isInstalledVersionVerified:
-                    !_.isUndefined(VERIFIED_RELEASES_OF_COMMON_DEPS[packageName]) ?
-                      VERIFIED_RELEASES_OF_COMMON_DEPS[packageName] === dependencyPkgMD.version :
-                      false,
+                    isCommon: !_.isUndefined(VERIFIED_RELEASES_OF_COMMON_DEPS[packageName]),
+                    verifiedReleaseVersion: VERIFIED_RELEASES_OF_COMMON_DEPS[packageName] || '',
+                    isInstalledVersionVerified:
+                      !_.isUndefined(VERIFIED_RELEASES_OF_COMMON_DEPS[packageName]) ?
+                        VERIFIED_RELEASES_OF_COMMON_DEPS[packageName] === dependencyPkgMD.version :
+                        false,
 
-                  isCore: !_.isUndefined(TRUSTED_RELEASES_OF_CORE_DEPS[packageName]),
-                  trustedSemverRange: TRUSTED_RELEASES_OF_CORE_DEPS[packageName],
-                  isInstalledVersionTrusted:
-                    !_.isUndefined(TRUSTED_RELEASES_OF_CORE_DEPS[packageName]) ?
-                      NPM.isVersionCompatible({ version: dependencyPkgMD.version, semverRange: TRUSTED_RELEASES_OF_CORE_DEPS[packageName] }).execSync() :
-                      false,
+                    isCore: !_.isUndefined(TRUSTED_RELEASES_OF_CORE_DEPS[packageName]),
+                    trustedSemverRange: TRUSTED_RELEASES_OF_CORE_DEPS[packageName],
+                    isInstalledVersionTrusted:
+                      !_.isUndefined(TRUSTED_RELEASES_OF_CORE_DEPS[packageName]) ?
+                        NPM.isVersionCompatible({ version: dependencyPkgMD.version, semverRange: TRUSTED_RELEASES_OF_CORE_DEPS[packageName] }).execSync() :
+                        false,
 
-                  size: total,
-                };
+                    size: total,
+                  };
+                  // if (!_.isUndefined(TRUSTED_RELEASES_OF_CORE_DEPS[packageName])) {
+                  //   console.log('**FOR '+packageName+'**:: NPM.isVersionCompatible({ version: dependencyPkgMD.version, semverRange: TRUSTED_RELEASES_OF_CORE_DEPS[packageName] }).execSync()',NPM.isVersionCompatible({ version: dependencyPkgMD.version, semverRange: TRUSTED_RELEASES_OF_CORE_DEPS[packageName] }).execSync());
+                  // }
+                  // else {
+                  //   console.log('**FOR '+packageName+'**:: not trusted');
+                  // }
+                } catch (e) { return next(e); }
 
                 return next();
-
               });//</Filesystem.readJson() :: read dependency's package.json file)>
             });//</recursion (to figure out how big dependency is, as far as bytes)>
           },//</‹···Each dep declared in the package.json file···›
@@ -379,12 +390,20 @@ require('machine-as-script')({
               // Package name, installed version, & semver range
               // ========================================================================
               // Core deps
-              if (depInfo.isInstalledVersionTrusted) {
-                // Installed version is a trusted release of a core dependency!
-                column1 += chalk.green('  ');
-                // column1 += chalk.green('✓ ');
-                if (depInfo.isCore) { column1 += chalk.reset(packageName); } else { column1 += chalk.reset(packageName); }
-                column1 += chalk.reset('@'+depInfo.installedVersion);
+              if (depInfo.isCore) {
+                if (depInfo.isInstalledVersionTrusted) {
+                  // Installed version is a trusted release of a core dependency!
+                  column1 += chalk.green('  ');
+                  // column1 += chalk.green('✓ ');
+                  if (depInfo.isCore) { column1 += chalk.reset(packageName); } else { column1 += chalk.reset(packageName); }
+                  column1 += chalk.reset('@'+depInfo.installedVersion);
+                }
+                else {
+                  // This is a core dep, but the installed version must not QUITE be valid (e.g. might be a prerelease)
+                  column1 += chalk.dim('¿ ');
+                  if (depInfo.isCore) { column1 += chalk.reset(packageName); } else { column1 += chalk.reset(packageName); }
+                  column1 += chalk.reset('@'+depInfo.installedVersion);
+                }
               }
               // Common deps
               else if (depInfo.isCommon) {
@@ -433,11 +452,16 @@ require('machine-as-script')({
               // If this is a core dependency, and the installed version is in the
               // trusted semver range, even though the installed version is different
               // from the range, draw the range subtly.
-              if (depInfo.isInstalledVersionTrusted) {
-                if (isDifferentEnoughToMaybeMatter) {
-                  column1 += chalk.dim('('+depInfo.semverRange+')')+'   ';
+              if (depInfo.isCore) {
+                if (depInfo.isInstalledVersionTrusted) {
+                  if (isDifferentEnoughToMaybeMatter) {
+                    column1 += chalk.dim('('+depInfo.semverRange+')')+'   ';
+                  }
+                  // otherwise no need to say anything
                 }
-                // otherwise no need to say anything
+                else {
+                  column1 += chalk.dim('(trusted pkg; untrusted svr: '+depInfo.semverRange+')')+'   ';
+                }
               }
               // If this is a common dependency...
               else if (depInfo.isCommon) {
@@ -451,12 +475,15 @@ require('machine-as-script')({
                   if (isDefinitelyNotPinned) {
                     column1 += chalk.red('(should be pinned @'+depInfo.verifiedReleaseVersion+')')+'   ';
                   }
+                  else if (depInfo.semverRange === depInfo.verifiedReleaseVersion) {
+                    column1 += chalk.red('(need to run `npm install '+packageName+' --force`)')+'   ';
+                  }
                   else {
                     column1 += chalk.red('(should instead be pinned @'+depInfo.verifiedReleaseVersion+')')+'   ';
                   }
-                }
+                }//</else :: installed version not verified>
               }
-              // Otherwise, draw it kind of angry.
+              // Otherwise (misc dependency)
               else {
                 if (isDefinitelyNotPinned) {
                   if (isDifferentEnoughToMaybeMatter) {
