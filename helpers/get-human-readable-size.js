@@ -51,7 +51,7 @@ module.exports = function getHumanReadableSize(sizeInBytes) {
   }
   // >1MB
   else if (sizeInMegabytes > 1) {
-    chalkToUse = chalk.yellow.dim;
+    chalkToUse = chalk.reset;
     unitsStr = 'MB';
   }
   // >500KB

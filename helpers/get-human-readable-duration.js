@@ -50,7 +50,7 @@ module.exports = function getHumanReadableDuration(seconds) {
   }
   // >1 secs
   else if (seconds > 1) {
-    chalkToUse = chalk.yellow.dim;
+    chalkToUse = chalk.reset;
     unitsStr = 'seconds';
   }
   // >0.5 secs
