@@ -68,6 +68,8 @@ module.exports = {
 
     'machinepack-npm': '*',
     'machinepack-localmachinepacks': '*',
+    'machinepack-stripe': '*',
+    'machinepack-markdown': '*',
 
     // This is not a complete list
     // (TODO: add to this list and expand ranges as it makes sense, over time)
