@@ -209,6 +209,9 @@ require('machine-as-script')({
               }//</else: misc dep>
 
             }//</already exists in package.json in either the deps or devDeps>
+            else {
+              console.log('Will install new dep ('+chalk.bold.yellow(nameOfPkgToInstall) + ') and pin it in the package.json file.');
+            }
 
             // >-•
 
