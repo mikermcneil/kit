@@ -140,6 +140,7 @@ require('machine-as-script')({
             // If so, then it may still be overridden, or we might still bail early.
 
             // Under a few circumstances, we'll bail now w/ an error msg:
+            // (or if it is in there BUT WRONG, then log a slightly different message)
             if (depInfo.kind === 'dev' && !_.isUndefined(depSemverRange)) {
               return done(new Error(nameOfPkgToInstall + ' is already in the package.json file, but as a normal (non-dev) dependency! ('+depSemverRange+').'));
             }
@@ -148,19 +149,16 @@ require('machine-as-script')({
             }
             else if (!_.isUndefined(depSemverRange) || !_.isUndefined(devDepSemverRange)) {
 
-              console.log(chalk.bold.cyan(nameOfPkgToInstall) + ' is already in the package.json file.');
-
-              // If it is in there BUT WRONG, then log a slightly different message
-              // and proceed (no need for `--force` since it's wrong anyway)
+              var logMsgPrefix = chalk.bold.cyan(nameOfPkgToInstall) + ' is already in the package.json file.';
 
               if (isCommon) {
                 if (relevantExistingSemverRange !== verifiedVersion) {
+                  console.log(logMsgPrefix);
                   console.log('But the existing semver range (`'+relevantExistingSemverRange+'`) isn\'t quite right.');
                   console.log('Should instead be pinned to '+verifiedVersion+'.  Proceeding to install and save...');
                 }
                 else {
-                  console.log('And it is already pinned to the correct version.');
-                  console.log(''+chalk.gray('Skipping... (Use `npm install '+nameOfPkgToInstall+' --force` if you want to (re)install this dep.)'));
+                  console.log(logMsgPrefix + chalk.gray('  ✓ Skipping... b/c it is already pinned to a verified version.'));
                   return done();
                 }
               }
@@ -172,15 +170,35 @@ require('machine-as-script')({
                 //   console.log('Should instead be within: '+trustedSemverRange);
                 // }
                 // else {
-                console.log(''+chalk.gray('Skipping... (Use `npm install '+nameOfPkgToInstall+' --force` if you want to (re)install this dep.)'));
+                console.log(logMsgPrefix + chalk.gray('  ✓ Skipping... b/c it is a core dep within a trusted range.'));
                 return done();
                 // }
               }
               // Otherwise, it's neither:
               else {
-                console.log('The specified dependency (`'+nameOfPkgToInstall+'`) is not a known common or core dependency.  (See `verifiedReleases` & `trustedReleases`.)');
-                console.log('Proceeding to install the latest release that matches this semver range (`'+relevantExistingSemverRange+'`), and then pin it in the package.json file...');
-              }
+
+                try {
+                  NPM.validateVersion({ string: relevantExistingSemverRange, strict: true }).execSync();
+
+                  // --• If it is valid, then bail early-- we don't need to do anything else.
+                  console.log(logMsgPrefix + chalk.gray('  ✓ Skipping... b/c it is pinned.'));
+                  return done();
+
+                } catch (e) {
+                  switch (e.exit) {
+                    // If the relevant existing semver range is not a valid version,
+                    // that means it is NOT pinned.  Since it is not pinned, then we need
+                    // to reinstall it, but pinned.
+                    case 'invalidSemanticVersion':
+                      console.log(logMsgPrefix);
+                      console.log('The specified dependency (`'+nameOfPkgToInstall+'`) is not a known common or core dependency.  (See `verifiedReleases` & `trustedReleases`.)');
+                      console.log('Proceeding to install the latest release that matches this semver range (`'+relevantExistingSemverRange+'`), and then pin it in the package.json file...');
+                      break;
+                    default: throw e;
+                  }
+                }
+              }//</else: misc dep>
+
             }//</already exists in package.json in either the deps or devDeps>
 
             // >-•
