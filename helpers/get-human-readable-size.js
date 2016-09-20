@@ -77,10 +77,10 @@ module.exports = function getHumanReadableSize(sizeInBytes) {
     return chalkToUse.bold(sizeInMegabytes)+chalkToUse(' MB');
   }
   else if (unitsStr === 'KB') {
-    return chalkToUse.bold(sizeInKilobytes)+chalkToUse(' KB');
+    return chalkToUse(sizeInKilobytes)+chalkToUse(' KB');
   }
   else {
-    return chalkToUse.bold(bytes)+chalkToUse(' bytes');
+    return chalkToUse(bytes)+chalkToUse(' bytes');
   }
 };
 

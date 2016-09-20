@@ -11,6 +11,7 @@
     "kit-about": "./bin/kit-about.js",
     "kit-exclaim": "./bin/kit-exclaim.js",
     "kit-deps": "./bin/kit-deps.js",
+    "kit-install": "./bin/kit-install.js",
     "kit-pkg": "./bin/kit-pkg.js"
   },
   "author": "Mike McNeil",
@@ -25,7 +26,7 @@
     "machine-as-script": "^4.0.6",
     "machinepack-fs": "^5.1.0",
     "machinepack-localmachinepacks": "^1.8.0",
-    "machinepack-npm": "^6.3.0",
+    "machinepack-npm": "6.4.0",
     "machinepack-process": "^2.0.2",
     "strip-ansi": "3.0.1",
     "word-wrap": "1.1.0"

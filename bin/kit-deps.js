@@ -5,134 +5,27 @@ require('machine-as-script')({
   friendlyName: 'kit deps',
 
 
+  description: 'Get the install footprint + versions of this package\'s dependencies.',
+
+
   extendedDescription: 'This only works with NPM 2.x (see [this issue](https://github.com/npm/npm/issues/10361) for more info).',
 
 
   inputs: {
 
     verifiedReleases: {
-      description: 'A dictionary mapping package names of common dependencies to the version string of a verified release.',
-      extendedDescription:
-      'On the Sails.js team, we prefer to pin the versions of 3rd party dependencies \n'+
-      'from outside of the project, just because we\'ve been burned on more than one occasion \n'+
-      'by patch or minor releases breaking functionality.  But while pinning depenency versions \n'+
-      'is great for maintainability, security, and stability, it does have the effect of defeating \n'+
-      'a powerful, built-in download size optimization in NPM. \n'+
-      '\n'+
-      'So, for certain *common* dependencies, like async and lodash, we\'re moving towards \n'+
-      'standardizing the pinned version number across all of our modules.  This reduces overall \n'+
-      '`npm install` time, makes for a more optimized bundle when browserifying, and, in general, \n'+
-      'makes packages easier to understand and troubleshoot. \n'+
-      '\n'+
-      'This is a dictionary of those "verified" versions for *common deps*. \n'+
-      '',
-      example: {},
-      defaultsTo: {
-        'async': '2.0.1',
-        'lodash': '3.10.1',
-        'debug': '2.2.0',
-        'chalk': '1.1.3',
-
-        'commander': '2.8.1',
-        'knex': '0.11.9',
-
-        'bcryptjs': '2.3.0',
-        'connect-redis': '3.1.0',
-
-        'ejs': '2.3.4',
-        'grunt': '1.0.1',
-        'grunt-cli': '1.2.0',
-        'grunt-contrib-clean': '1.0.0',
-        'grunt-contrib-coffee': '1.0.0',
-        'grunt-contrib-concat': '1.0.1',
-        'grunt-contrib-copy': '1.0.0',
-        'grunt-contrib-cssmin': '1.0.1',
-        'grunt-contrib-jst': '1.0.0',
-        'grunt-contrib-less': '1.3.0',
-        'grunt-contrib-uglify': '1.0.1',
-        'grunt-contrib-watch': '1.0.0',
-        'grunt-hash': '0.5.0',
-        'grunt-sails-linker': '0.10.1',
-        'grunt-sync': '0.5.2',
-        'rc': '1.0.1',
-        // This is not a complete list.
-        // (TODO: add to this list over time)
-      }
+      description: require('../constants/verified-releases.type').description,
+      extendedDescription: require('../constants/verified-releases.type').extendedDescription,
+      example: require('../constants/verified-releases.type').example,
+      defaultsTo: require('../constants/verified-releases.type').defaultsTo
     },
 
     trustedReleases: {
-      description: 'A set of trusted releases of internal packages. Loose semver ranges will be tolerated as long as they match the specified semver range.',
-      extendedDescription:
-      'There are also certain dependencies which our team directly maintains.\n'+
-      '\n'+
-      'Since we have the direct ability to publish patches, we are ultimately responsible for\n'+
-      'ensuring that those dependencies use proper semantic versioning.  In an effort to keep\n'+
-      'us honest and make sure that we only break features on major version bumps, we use loose\n'+
-      'semver ranges for our internal dependencies as much as possible.\n'+
-      '\n'+
-      'This is not by any means a complete list-- it just has a few of the most commonly-used\n'+
-      'packages that we maintain.  It will be expanded over time.\n'+
-      '',
-      example: {},
-      defaultsTo: {
-        'sails': '*',
-
-        'waterline': '*',
-        'sails-disk': '*',
-        'sails-postgresql': '0.11.4',
-
-        'skipper': '*',
-        'skipper-disk': '*',
-
-        'include-all': '*',
-        'sails.io.js': '*',
-
-        'sails-stdlib': '*',
-        'stdlib': '*',
-        'machinepack-ifthen': '*',
-        'machinepack-strings': '*',
-        'machinepack-numbers': '*',
-        'machinepack-booleans': '*',
-        'machinepack-dictionaries': '*',
-        'machinepack-arrays': '*',
-        'machinepack-json': '*',
-        'machinepack-datetime': '*',
-        'machinepack-math': '*',
-        'machinepack-paths': '*',
-        'machinepack-urls': '*',
-        'machinepack-emailaddresses': '*',
-        'machinepack-fs': '*',
-        'machinepack-http': '*',
-        'machinepack-process': '*',
-        'machinepack-console': '*',
-        'machinepack-util': '*',
-        'machinepack-waterline': '*',
-        'machinepack-sockets': '*',
-        'machinepack-reqres': '*',
-        'machinepack-sessionauth': '*',
-        'machinepack-passwords': '*',
-        'machinepack-mailgun': '*',
-        'machinepack-gravatar': '*',
-        'machinepack-sails': '*',
-
-        'anchor': '*',
-        'machine': '*',
-        'rttc': '*',
-        'switchback': '*',
-
-        'aim-error-at': '*',
-        'machine-as-script': '*',
-        'machine-as-action': '*',
-        'browserify-transform-machinepack': '*',
-        'test-machinepack-mocha': '*',
-        'test-machinepack': '*',
-
-        'machinepack-npm': '*',
-        'machinepack-localmachinepacks': '*',
-
-        // This is not a complete list
-        // (TODO: add to this list and expand ranges as it makes sense, over time)
-      }
+      // Note that, for these, loose semver ranges will be tolerated as long as they match the specified semver range.
+      description: require('../constants/trusted-releases.type').description,
+      extendedDescription: require('../constants/trusted-releases.type').extendedDescription,
+      example: require('../constants/trusted-releases.type').example,
+      defaultsTo: require('../constants/trusted-releases.type').defaultsTo,
     }
 
   },

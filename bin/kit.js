@@ -24,6 +24,7 @@ program
 program.usage(chalk.gray('[options]')+' '+chalk.bold('<command>'))
 .command('pkg', 'show the version of the package in the current directory')
 .command('deps', 'get the install footprint + versions of this package\'s dependencies')
+.command('install', 'install & save the verified/trusted release of a dep here')
 .command('exclaim', 'convert a message to ASCII art and copy it to your clipboard')
 // .command('h1', 'create a heading for your JavaScript code')
 // .command('h2', 'create a sub-heading for your JavaScript code')

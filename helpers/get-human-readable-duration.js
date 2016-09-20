@@ -75,10 +75,10 @@ module.exports = function getHumanReadableDuration(seconds) {
     return chalkToUse.bold(hours)+chalkToUse(' hours');
   }
   else if (unitsStr === 'minutes') {
-    return chalkToUse.bold(minutes)+chalkToUse(' minutes');
+    return chalkToUse(minutes)+chalkToUse(' minutes');
   }
   else {
-    return chalkToUse.bold(seconds)+chalkToUse(' seconds');
+    return chalkToUse(seconds)+chalkToUse(' seconds');
   }
 
 };
