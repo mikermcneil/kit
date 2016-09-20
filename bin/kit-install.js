@@ -107,6 +107,8 @@ require('machine-as-script')({
           });
         }
 
+        // Keep track of things we install below.
+        var thingsInstalled = [];
 
         // Now install all deps.
         async.eachLimit(depsToInstall, 5, function (depInfo, done){
@@ -149,16 +151,17 @@ require('machine-as-script')({
             }
             else if (!_.isUndefined(depSemverRange) || !_.isUndefined(devDepSemverRange)) {
 
-              var logMsgPrefix = chalk.bold.cyan(nameOfPkgToInstall) + ' is already in the package.json file.';
-
               if (isCommon) {
                 if (relevantExistingSemverRange !== verifiedVersion) {
-                  console.log(logMsgPrefix);
-                  console.log('But the existing semver range (`'+relevantExistingSemverRange+'`) isn\'t quite right.');
-                  console.log('Should instead be pinned to '+verifiedVersion+'.  Proceeding to install and save...');
+                  console.log(chalk.bold.yellow(nameOfPkgToInstall) + ' is already in the package.json file.');
+                  console.log(chalk.gray(' But the existing semver range (`'+relevantExistingSemverRange+'`) isn\'t quite right.  Should instead be pinned to '+verifiedVersion+'.  Proceeding to install and save...'));
+                  console.log(chalk.gray(' Proceeding to install and save...'));
                 }
                 else {
-                  console.log(logMsgPrefix + chalk.gray('  ✓ Skipping... b/c it is already pinned to a verified version.'));
+                  console.log(
+                    chalk.bold.cyan(nameOfPkgToInstall) + ' is already in the package.json file.' +
+                    chalk.gray('  ✓ Skipping... b/c it is already pinned to a verified version.')
+                  );
                   return done();
                 }
               }
@@ -170,7 +173,10 @@ require('machine-as-script')({
                 //   console.log('Should instead be within: '+trustedSemverRange);
                 // }
                 // else {
-                console.log(logMsgPrefix + chalk.gray('  ✓ Skipping... b/c it is a core dep within a trusted range.'));
+                console.log(
+                  chalk.bold.cyan(nameOfPkgToInstall) + ' is already in the package.json file.' +
+                  chalk.gray('  ✓ Skipping... b/c it is a core dep within a trusted range.')
+                );
                 return done();
                 // }
               }
@@ -181,7 +187,10 @@ require('machine-as-script')({
                   NPM.validateVersion({ string: relevantExistingSemverRange, strict: true }).execSync();
 
                   // --• If it is valid, then bail early-- we don't need to do anything else.
-                  console.log(logMsgPrefix + chalk.gray('  ✓ Skipping... b/c it is pinned.'));
+                  console.log(
+                    chalk.bold.cyan(nameOfPkgToInstall) + ' is already in the package.json file.' +
+                    chalk.gray('  ✓ Skipping... b/c it is pinned.')
+                  );
                   return done();
 
                 } catch (e) {
@@ -190,9 +199,9 @@ require('machine-as-script')({
                     // that means it is NOT pinned.  Since it is not pinned, then we need
                     // to reinstall it, but pinned.
                     case 'invalidSemanticVersion':
-                      console.log(logMsgPrefix);
-                      console.log('The specified dependency (`'+nameOfPkgToInstall+'`) is not a known common or core dependency.  (See `verifiedReleases` & `trustedReleases`.)');
-                      console.log('Proceeding to install the latest release that matches this semver range (`'+relevantExistingSemverRange+'`), and then pin it in the package.json file...');
+                      console.log(chalk.bold.yellow(nameOfPkgToInstall) + ' is already in the package.json file.');
+                      console.log(chalk.gray(' The specified dependency (`'+nameOfPkgToInstall+'`) is not a known common or core dependency.  (See `verifiedReleases` & `trustedReleases`.)'));
+                      console.log(chalk.gray(' Proceeding to install the latest release that matches this semver range (`'+relevantExistingSemverRange+'`), and then pin it in the package.json file...'));
                       break;
                     default: throw e;
                   }
@@ -234,14 +243,19 @@ require('machine-as-script')({
             }).exec(function (err) {
               if (err) { return done(err); }
 
+              // Track this as installed.
+              thingsInstalled.push(nameOfPkgToInstall);
+
               return done();
             });//</NPM.installPackage>
           } catch (e) { return done(e); }
         }, function (err) {
           if (err) { return exits.error(err); }
 
-          console.log();
-          console.log(chalk.green('✓')+' Install completed successfully!');
+          if (thingsInstalled.length > 0) {
+            console.log();
+            console.log(chalk.green('✓')+' Updated '+thingsInstalled.length+' dependenc'+(thingsInstalled.length !== 1 ? 'ies' : 'y')+'.');
+          }
 
           return exits.success();
 
