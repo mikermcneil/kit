@@ -28,6 +28,7 @@ module.exports = {
     'knex': '0.11.9',
 
     'bcryptjs': '2.3.0',
+    'semver': '4.3.6',
     'connect-redis': '3.1.0',
 
     'ejs': '2.3.4',
