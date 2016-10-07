@@ -58,6 +58,7 @@ module.exports = {
     'machine': '*',
     'rttc': '*',
     'switchback': '^2.0.1',
+    'reportback': '^2.0.1',
 
     'aim-error-at': '*',
     'machine-as-script': '*',
