@@ -214,6 +214,20 @@ require('machine-as-script')({
 
                     size: total,
                   };
+
+                  // Always consider scoped dependencies as trusted, even if they
+                  // aren't in the trustedSemverRange dictionary.  (Though, if they
+                  // ARE in there, then the semver range in there takes precedence.
+                  // Otherwise, this defaults to "*")
+                  if (packageName.match(/^@/) && _.isUndefined(TRUSTED_RELEASES_OF_CORE_DEPS[packageName])) {
+                    depInfos[packageName].isCore = true;
+                    depInfos[packageName].trustedSemverRange = '*';
+                    depInfos[packageName].isInstalledVersionTrusted = NPM.isVersionCompatible({
+                      version: dependencyPkgMD.version,
+                      semverRange: '*'
+                    }).execSync();
+                  }//>-
+
                   // if (!_.isUndefined(TRUSTED_RELEASES_OF_CORE_DEPS[packageName])) {
                   //   console.log('**FOR '+packageName+'**:: NPM.isVersionCompatible({ version: dependencyPkgMD.version, semverRange: TRUSTED_RELEASES_OF_CORE_DEPS[packageName] }).execSync()',NPM.isVersionCompatible({ version: dependencyPkgMD.version, semverRange: TRUSTED_RELEASES_OF_CORE_DEPS[packageName] }).execSync());
                   // }
