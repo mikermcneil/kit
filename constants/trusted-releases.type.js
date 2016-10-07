@@ -57,7 +57,7 @@ module.exports = {
     'anchor': '*',
     'machine': '*',
     'rttc': '*',
-    'switchback': '*',
+    'switchback': '^2.0.1',
 
     'aim-error-at': '*',
     'machine-as-script': '*',

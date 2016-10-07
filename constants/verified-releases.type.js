@@ -47,7 +47,7 @@ module.exports = {
     'grunt-sails-linker': '0.10.1',
     'grunt-sync': '0.5.2',
     'rc': '1.0.1',
-    'mocha': '3.0.2'
+    'mocha': '3.0.2',
 
     // This is not a complete list.
     // (TODO: add to this list over time)
