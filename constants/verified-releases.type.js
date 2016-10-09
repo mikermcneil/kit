@@ -50,6 +50,7 @@ module.exports = {
     'mocha': '3.0.2',
 
     'waterline-errors': '0.10.1',
+    'waterline-sequel': '0.6.4',
 
     // This is not a complete list.
     // (TODO: add to this list over time)
