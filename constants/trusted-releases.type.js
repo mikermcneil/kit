@@ -20,6 +20,9 @@ module.exports = {
     'sails-disk': '*',
     'sails-postgresql': '0.11.4',
 
+    'waterline-criteria': '^1.0.1',
+    'waterline-cursor': '~0.0.7',
+
     'skipper': '*',
     'skipper-disk': '*',
 

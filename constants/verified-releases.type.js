@@ -49,6 +49,8 @@ module.exports = {
     'rc': '1.0.1',
     'mocha': '3.0.2',
 
+    'waterline-errors': '0.10.1',
+
     // This is not a complete list.
     // (TODO: add to this list over time)
   }
