@@ -17,8 +17,10 @@ module.exports = {
     'sails': '*',
 
     'waterline': '*',
-    'sails-disk': '*',
-    'sails-postgresql': '0.11.4',
+    'sails-disk': '^0.10.10',
+    'sails-memory': '^0.10.7',
+    'sails-mysql': '^0.11.5',
+    'sails-postgresql': '^0.11.4',
 
     'waterline-criteria': '^1.0.1',
     'waterline-cursor': '^0.0.7',

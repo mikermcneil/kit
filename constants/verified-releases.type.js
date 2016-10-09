@@ -19,14 +19,14 @@ module.exports = {
   defaultsTo: {
     'async': '2.0.1',
     'lodash': '3.10.1',
-    'debug': '2.2.0',
-    'chalk': '1.1.3',
 
+    'chalk': '1.1.3',
     'commander': '2.8.1',
+
     'request': '2.74.0',
     'fs-extra': '0.30.0',
     'knex': '0.11.9',
-
+    'debug': '2.2.0',
     'bcryptjs': '2.3.0',
     'semver': '4.3.6',
     'connect-redis': '3.1.0',
@@ -51,6 +51,12 @@ module.exports = {
 
     'waterline-errors': '0.10.1',
     'waterline-sequel': '0.6.4',
+
+    // Uncommon deps used in built-in Waterline modules:
+    'npm': '2.15.6',
+    'chai': '3.5.0',
+    'jpath': '0.0.20',
+    'should': '9.0.0',
 
     // This is not a complete list.
     // (TODO: add to this list over time)
