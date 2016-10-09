@@ -22,6 +22,7 @@ module.exports = {
 
     'waterline-criteria': '^1.0.1',
     'waterline-cursor': '~0.0.7',
+    'waterline-adapter-tests': '~0.12.1',
 
     'skipper': '*',
     'skipper-disk': '*',
