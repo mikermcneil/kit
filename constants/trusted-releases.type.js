@@ -62,6 +62,7 @@ module.exports = {
     'rttc': '*',
     'switchback': '^2.0.1',
     'reportback': '^2.0.1',
+    'captains-log': '^1.0.1',
 
     'aim-error-at': '*',
     'machine-as-script': '*',
