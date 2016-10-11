@@ -29,8 +29,9 @@ module.exports = {
     'skipper': '*',
     'skipper-disk': '*',
 
-    'include-all': '*',
-    'sails.io.js': '*',
+    'include-all': '^1.0.5',
+    'sails.io.js': '^0.14.0',
+    'sails.io.js-dist': '^0.14.0',
 
     'sails-stdlib': '*',
     'stdlib': '*',
