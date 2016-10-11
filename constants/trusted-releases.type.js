@@ -67,6 +67,7 @@ module.exports = {
     'reportback': '^2.0.1',
     'captains-log': '^1.0.1',
 
+    'flaverr': '^1.0.0',
     'aim-error-at': '*',
     'machine-as-script': '*',
     'machine-as-action': '*',
