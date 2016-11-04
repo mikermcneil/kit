@@ -39,6 +39,7 @@ module.exports = {
 
     'sails-generate': '^1.4.0',
     'grunt-sails-linker': '^1.0.3',
+    'sort-route-addresses': '^0.0.1',
 
     'sails-stdlib': '*',
     'stdlib': '*',
