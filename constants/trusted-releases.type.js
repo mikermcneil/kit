@@ -34,6 +34,9 @@ module.exports = {
     'sails.io.js': '^0.14.0',
     'sails.io.js-dist': '^0.14.0',
 
+    'sails-generate': '^1.4.0',
+    'grunt-sails-linker': '^1.0.3',
+
     'sails-stdlib': '*',
     'stdlib': '*',
     'machinepack-ifthen': '*',
