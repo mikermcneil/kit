@@ -15,7 +15,10 @@ module.exports = {
   example: {},
   defaultsTo: {
     'sails': '*',
-    '@sailshq/lodash': '*',
+
+    'sails-hook-sockets': '^1.0.1',
+    'sails-hook-orm': '^1.0.7',
+    'sails-hook-grunt': '^1.0.0',
 
     'waterline': '*',
     'sails-disk': '^0.10.10',
@@ -84,6 +87,8 @@ module.exports = {
     'machinepack-localmachinepacks': '*',
     'machinepack-stripe': '*',
     'machinepack-markdown': '*',
+
+    '@sailshq/lodash': '*',
 
     // This is not a complete list
     // (TODO: add to this list and expand ranges as it makes sense, over time)
