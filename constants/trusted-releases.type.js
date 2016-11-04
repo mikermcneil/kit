@@ -15,6 +15,7 @@ module.exports = {
   example: {},
   defaultsTo: {
     'sails': '*',
+    '@sailshq/lodash': '*',
 
     'waterline': '*',
     'sails-disk': '^0.10.10',
