@@ -32,6 +32,7 @@ module.exports = {
 
     'skipper': '*',
     'skipper-disk': '*',
+    'skipper-adapter-tests': '^1.5.8',
 
     'include-all': '^1.0.5',
     'sails.io.js': '^1.0.0',
