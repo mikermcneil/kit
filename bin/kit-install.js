@@ -16,18 +16,41 @@ require('machine-as-script')({
     },
 
     verifiedReleases: {
-      description: require('../constants/verified-releases.type').description,
-      extendedDescription: require('../constants/verified-releases.type').extendedDescription,
-      example: require('../constants/verified-releases.type').example,
-      defaultsTo: require('../constants/verified-releases.type').defaultsTo
+      description: 'A dictionary mapping package names of common dependencies to the version string of a verified release.',
+      extendedDescription:
+      'On the Sails.js team, we prefer to pin the versions of 3rd party dependencies \n'+
+      'from outside of the project, just because we\'ve been burned on more than one occasion \n'+
+      'by patch or minor releases breaking functionality.  But while pinning depenency versions \n'+
+      'is great for maintainability, security, and stability, it does have the effect of defeating \n'+
+      'a powerful, built-in download size optimization in NPM. \n'+
+      '\n'+
+      'So, for certain *common* dependencies, like async and lodash, we\'re moving towards \n'+
+      'standardizing the pinned version number across all of our modules.  This reduces overall \n'+
+      '`npm install` time, makes for a more optimized bundle when browserifying, and, in general, \n'+
+      'makes packages easier to understand and troubleshoot. \n'+
+      '\n'+
+      'This is a dictionary of those "verified" versions for *common deps*. \n'+
+      '',
+      example: {},
+      defaultsTo: require('roadstead').verifiedReleases
     },
 
     trustedReleases: {
       // Note that, for these, loose semver ranges will be tolerated as long as they match the specified semver range.
-      description: require('../constants/trusted-releases.type').description,
-      extendedDescription: require('../constants/trusted-releases.type').extendedDescription,
-      example: require('../constants/trusted-releases.type').example,
-      defaultsTo: require('../constants/trusted-releases.type').defaultsTo,
+      description: 'A set of trusted semver ranges of internal and/or core packages.',
+      extendedDescription:
+      'There are also certain dependencies which our team directly maintains.\n'+
+      '\n'+
+      'Since we have the direct ability to publish patches, we are ultimately responsible for\n'+
+      'ensuring that those dependencies use proper semantic versioning.  In an effort to keep\n'+
+      'us honest and make sure that we only break features on major version bumps, we use loose\n'+
+      'semver ranges for our internal dependencies as much as possible.\n'+
+      '\n'+
+      'This is not by any means a complete list-- it just has a few of the most commonly-used\n'+
+      'packages that we maintain.  It will be expanded over time.\n'+
+      '',
+      example: {},
+      defaultsTo: require('roadstead').trustedSemverRanges,
     }
 
   },
