@@ -20,6 +20,9 @@ module.exports = {
     'sails-hook-orm': '^1.0.7',
     'sails-hook-grunt': '^1.0.0',
 
+    'sails-hook-dev': '^1.1.0',
+    'sails-hook-apianalytics': '^1.1.3',
+
     'waterline': '*',
     'sails-disk': '^0.10.10',
     'sails-memory': '^0.10.7',
