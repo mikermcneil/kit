@@ -28,7 +28,7 @@
     "machinepack-localmachinepacks": "^1.8.0",
     "machinepack-npm": "6.4.0",
     "machinepack-process": "^2.0.2",
-    "roadstead": "^1.0.0",
+    "roadstead": "treelinehq/roadstead",
     "strip-ansi": "3.0.1",
     "word-wrap": "1.1.0"
   }
