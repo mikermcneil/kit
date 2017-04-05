@@ -324,7 +324,8 @@ require('machine-as-script')({
                 }
                 else {
                   // This is a core dep, but the installed version must not QUITE be valid (e.g. might be a prerelease)
-                  column1 += chalk.dim('¿ ');
+                  // (In most cases, prereleases are in use on purpose anyway. So we wouldn't want to make this red & angry!)
+                  column1 += chalk.dim('  ');
                   if (depInfo.isCore) { column1 += chalk.reset(packageName); } else { column1 += chalk.reset(packageName); }
                   column1 += chalk.reset('@'+depInfo.installedVersion);
                 }
@@ -349,17 +350,20 @@ require('machine-as-script')({
               else {
                 // Installed version might or might not be ok...
                 //
-                // If this is DEFINITELY not a pinned dependency (meaning it is a loose semver range...)
+                // If this is DEFINITELY NOT a pinned dependency (meaning it is a loose semver range...)
                 if (isDefinitelyNotPinned) {
                   column1 += chalk.bold.yellow('! ');
                   if (depInfo.isCore) { column1 += chalk.reset(packageName); } else { column1 += chalk.reset(packageName); }
                   column1 += chalk.reset('@'+depInfo.installedVersion);
                 }
                 // Otherwise, it's probably a pinned dependency version, which means it's probably fine.
+                // (Still, you might care that you're using a dependency which has not been verified, even
+                // though you've presumably pinned the version.  So in this case we'll make the text blue
+                // to keep track.)
                 else {
                   column1 += chalk.dim('  ');
-                  if (depInfo.isCore) { column1 += chalk.reset(packageName); } else { column1 += chalk.reset(packageName); }
-                  column1 += chalk.reset('@'+depInfo.installedVersion);
+                  column1 += chalk.blue(packageName);
+                  column1 += chalk.blue.dim('@'+depInfo.installedVersion);
                 }
               }
 
