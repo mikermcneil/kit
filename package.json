@@ -4,7 +4,9 @@
   "description": "A couple of command-line utilities.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run custom-tests && nodever=`node -e \"console.log('\\`node -v\\`'[1]);\"` && if [ $nodever != \"0\" ]; then npm run lint; fi",
+    "custom-tests": "echo \"No custom tests available.\"",
+    "lint": "node ./node_modules/eslint/bin/eslint . --max-warnings=0"
   },
   "bin": {
     "kit": "./bin/kit.js",
@@ -31,5 +33,9 @@
     "roadstead": "treelinehq/roadstead",
     "strip-ansi": "3.0.1",
     "word-wrap": "1.1.0"
-  }
+  },
+  "devDependencies": {
+    "eslint": "3.5.0"
+  },
+  "repository": "https://github.com/mikermcneil/kit.git"
 }
