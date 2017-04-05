@@ -35,11 +35,11 @@ require('machine-as-script')({
         return exits.error(err);
       },
       // No file exists at the provided `source` path
-      doesNotExist: function() {
+      doesNotExist: function(err) {
         return exits.notAnNpmPackage(err);
       },
       // Could not parse file as JSON.
-      couldNotParse: function() {
+      couldNotParse: function(err) {
         return exits.notAnNpmPackage(err);
       },
       // OK.
@@ -67,7 +67,6 @@ require('machine-as-script')({
 
 }).exec({
   success: function (parsedMetadata){
-    var _ = require('lodash');
     var chalk = require('chalk');
 
     console.log('-----------------------------------------------------------------');

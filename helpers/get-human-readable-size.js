@@ -80,7 +80,7 @@ module.exports = function getHumanReadableSize(sizeInBytes) {
     return chalkToUse(sizeInKilobytes)+chalkToUse(' KB');
   }
   else {
-    return chalkToUse(bytes)+chalkToUse(' bytes');
+    return chalkToUse(sizeInBytes)+chalkToUse(' bytes');
   }
 };
 

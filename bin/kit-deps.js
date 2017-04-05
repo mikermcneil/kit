@@ -71,8 +71,6 @@ require('machine-as-script')({
     var stripAnsi = require('strip-ansi');
     var async = require('async');
     var Filesystem = require('machinepack-fs');
-    var Process = require('machinepack-process');
-    var LocalMachinepacks = require('machinepack-localmachinepacks');
     var NPM = require('machinepack-npm');
     var getHumanReadableSize = require('../helpers/get-human-readable-size');
     var getHumanReadableDuration = require('../helpers/get-human-readable-duration');
@@ -131,7 +129,7 @@ require('machine-as-script')({
             // Look it up on disk and figure out how big.
             //
             // > Note:  Could have done `Process.executeCommand({ command: 'du -h '+absPathToDep }).exec(...)`
-            // > except that it doesn't work on windows.  So instead, I modified a quick hack from
+            // > except that `du` doesn't work on windows.  So instead, I modified a quick hack from
             // > StackOverflow (see http://stackoverflow.com/a/7550430/486547).
             (
               // ‹ƒ·∞› | Define self-calling recursive iteratee.
@@ -200,12 +198,8 @@ require('machine-as-script')({
                 });//</fs.lstat()>
 
               }//···‹On directory›···
-            )
-            // ƒ(…) | Kick off recursion.
-            (absPathToDep,
-
-            // ~∞%°  after recursion…
-            function afterwards(err, total){
+            )(absPathToDep, function afterwards(err, total){
+              // ~∞%°  after recursion…
               if (err) { return next(err); }
 
               // Now read this dependency's package.json file.
@@ -260,9 +254,9 @@ require('machine-as-script')({
                 } catch (e) { return next(e); }
 
                 return next();
-              });//</Filesystem.readJson() :: read dependency's package.json file)>
-            });//</recursion (to figure out how big dependency is, as far as bytes)>
-          },//</‹···Each dep declared in the package.json file···›
+              });//</ Filesystem.readJson() :: read dependency's package.json file)>
+            });//</ recursion (to figure out how big dependency is, as far as bytes)>
+          },//</ ‹···Each dep declared in the package.json file···›
 
           // ~∞%°  after async.each…
           function afterwards(err) {
@@ -278,7 +272,7 @@ require('machine-as-script')({
 
             // Calculate total size of all dependencies.
             var totalSize = 0;
-            _.each(depInfos, function (depInfo, packageName) {
+            _.each(depInfos, function (depInfo /*, packageName */) {
               totalSize += depInfo.size;
             });
 

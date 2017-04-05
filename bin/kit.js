@@ -4,7 +4,6 @@
  * Module dependencies
  */
 
-var util = require('util');
 var program = require('commander');
 var chalk = require('chalk');
 var _ = require('lodash');
