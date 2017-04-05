@@ -255,8 +255,8 @@ require('machine-as-script')({
 
                 return next();
               });//</ Filesystem.readJson() :: read dependency's package.json file)>
-            });//</ recursion (to figure out how big dependency is, as far as bytes)>
-          },//</ ‹···Each dep declared in the package.json file···›
+            });//</ self-calling function :: recursion (to figure out how big dependency is, as far as bytes)>
+          },//</ async.each()  ‹···Each dep declared in the package.json file···›
 
           // ~∞%°  after async.each…
           function afterwards(err) {
