@@ -58,6 +58,10 @@ require('machine-as-script')({
 
     notAnNpmPackage: {
       description: 'This is not an NPM package.'
+    },
+
+    unsupportedNodeVersion: {
+      description: 'Unsupported Node or NPM version.'
     }
 
   },
@@ -74,6 +78,15 @@ require('machine-as-script')({
     var NPM = require('machinepack-npm');
     var getHumanReadableSize = require('../helpers/get-human-readable-size');
     var getHumanReadableDuration = require('../helpers/get-human-readable-duration');
+
+
+    var nodeVersionNum = process.version.match(/^v([^\.]+)\./, '')[1];
+    if (nodeVersionNum > 4) {
+      return exits.unsupportedNodeVersion(
+        'Currently, `kit deps` is only supported on Node versions 4 and below (i.e. versions that use NPM v2.)\n'+
+        '(But help is welcome!  Please tweet @mikermcneil if you have time to contribute to this.)'
+      );
+    }//-•
 
 
     // A dictionary mapping the package names of common dependencies to the version number of a verified release.
