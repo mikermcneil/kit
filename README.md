@@ -4,7 +4,7 @@
 A simple command-line tool with a few handy tools, including:
 
 + generating ASCII art from text
-+ verifying package.json dependencies (vs. [roadstead](https://npmjs.com/package/roadstead))
++ verifying package.json dependencies (vs. [rodestead](https://npmjs.com/package/rodestead))
 
 
 

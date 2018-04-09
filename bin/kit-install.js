@@ -32,7 +32,7 @@ require('machine-as-script')({
       'This is a dictionary of those "verified" versions for *common deps*. \n'+
       '',
       example: {},
-      defaultsTo: require('roadstead').verifiedReleases
+      defaultsTo: require('rodestead').verifiedReleases
     },
 
     trustedReleases: {
@@ -50,7 +50,7 @@ require('machine-as-script')({
       'packages that we maintain.  It will be expanded over time.\n'+
       '',
       example: {},
-      defaultsTo: require('roadstead').trustedSemverRanges,
+      defaultsTo: require('rodestead').trustedSemverRanges,
     }
 
   },

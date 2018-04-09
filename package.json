@@ -30,7 +30,7 @@
     "machinepack-localmachinepacks": "^1.8.0",
     "machinepack-npm": "6.4.0",
     "machinepack-process": "^2.0.2",
-    "roadstead": "treelinehq/roadstead",
+    "rodestead": "sailshq/rodestead",
     "strip-ansi": "3.0.1",
     "word-wrap": "1.1.0"
   },
